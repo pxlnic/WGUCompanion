@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.wgu_companion.wgucompanion.HomeActivity">
+    tools:context="com.example.wgu_companion.wgucompanion.CoursesOverviewActivity">
 
     <item
         android:id="@id/add_course"

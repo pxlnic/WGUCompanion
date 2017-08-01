@@ -31,7 +31,7 @@
             android:parentActivityName=".HomeActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.wgu_companion.wgucompanion.CoursesOverviewActivity" />
+                android:value="com.example.wgu_companion.wgucompanion.HomeActivity" />
         </activity>
         />
         <activity
@@ -40,16 +40,16 @@
             android:parentActivityName=".HomeActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.wgu_companion.wgucompanion.AssessmentOverviewActivity" />
+                android:value="com.example.wgu_companion.wgucompanion.HomeActivity" />
         </activity>
 
         <activity
             android:name=".CourseNotesActivity"
             android:label="Course Notes"
-            android:parentActivityName=".AssessmentOverviewActivity">
+            android:parentActivityName=".AssessmentsDetailActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.wgu_companion.wgucompanion.AssessmentOverviewActivity" />
+                android:value="com.example.wgu_companion.wgucompanion.AssessmentsDetailActivity" />
         </activity>
 
         <activity android:name=".TermDetailActivity"

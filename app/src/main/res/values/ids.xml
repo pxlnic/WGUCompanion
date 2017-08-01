@@ -10,4 +10,14 @@
     <item name="view_remaining_assessments" type="id">View Remaining Assessments</item>
     <item name="course_assessments_list" type="id">Course Assessment List</item>
     <item name="course_mentor_list" type="id">Course Mentor List</item>
+    <item name="delete_note" type="id">Delete Note</item>
+    <item name="add_photo" type="id">Add Photo</item>
+    <item name="share_note" type="id">Share Note</item>
+    <item name="edit_course" type="id">Edit Course</item>
+    <item name="delete_course" type="id">Delete Course</item>
+    <item name="add_note" type="id">Add Note</item>
+    <item name="edit_term" type="id">Edit Term</item>
+    <item name="delete_term" type="id">Delete Term</item>
+    <item name="edit_assessment" type="id">Edit Assessment</item>
+    <item name="delete_assessment" type="id">Delete Assessment</item>
 </resources>

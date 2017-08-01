@@ -32,6 +32,9 @@ public class HomeActivity extends AppCompatActivity {
     private int totalCUs;
     private String progressText = completedCUs + "/" + totalCUs + " CUs";
 
+    //Passed Variables
+    private int programId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

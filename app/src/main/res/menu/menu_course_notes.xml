@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@id/delete_note"
+        android:orderInCategory="101"
+        android:title="Delete Note"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@id/add_photo"
+        android:orderInCategory="102"
+        android:title="Add Photo"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@id/share_note"
+        android:orderInCategory="103"
+        android:title="Share Note"
+        app:showAsAction="never" />
+
+</menu>
