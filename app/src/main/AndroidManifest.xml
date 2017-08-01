@@ -9,40 +9,67 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity android:name=".HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".TermsOverviewActivity"
+        <activity
+            android:name=".TermsOverviewActivity"
             android:label="Terms"
             android:parentActivityName=".HomeActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.wgu_companion.wgucompanion.AssessmentOverviewActivity"/>
-        </activity>/>
-
-        <activity android:name=".CoursesOverviewActivity"
+                android:value="com.example.wgu_companion.wgucompanion.AssessmentOverviewActivity" />
+        </activity>
+        />
+        <activity
+            android:name=".CoursesOverviewActivity"
             android:label="Courses"
             android:parentActivityName=".HomeActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.wgu_companion.wgucompanion.CoursesOverviewActivity"/>
-        </activity>/>
-
-        <activity android:name=".AssessmentOverviewActivity"
+                android:value="com.example.wgu_companion.wgucompanion.CoursesOverviewActivity" />
+        </activity>
+        />
+        <activity
+            android:name=".AssessmentOverviewActivity"
             android:label="Assessments"
             android:parentActivityName=".HomeActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.wgu_companion.wgucompanion.AssessmentOverviewActivity"/>
+                android:value="com.example.wgu_companion.wgucompanion.AssessmentOverviewActivity" />
         </activity>
 
-        <activity android:name=".CourseNotesActivity"
+        <activity
+            android:name=".CourseNotesActivity"
             android:label="Course Notes"
+            android:parentActivityName=".AssessmentOverviewActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.wgu_companion.wgucompanion.AssessmentOverviewActivity" />
+        </activity>
+
+        <activity android:name=".TermDetailActivity"
+            android:label="Term Detail"
+            android:parentActivityName=".TermsOverviewActivity">
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.example.wgu_companion.wgucompanion.TermsOverviewActivity"/>
+        </activity>
+
+        <activity android:name=".CoursesDetailActivity"
+            android:label="Course Detail"
+            android:parentActivityName=".CoursesOverviewActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.wgu_companion.wgucompanion.CoursesOverviewActivity"/>
+        </activity>
+
+        <activity android:name=".AssessmentsDetailActivity"
+            android:label="Assessment Detail"
             android:parentActivityName=".AssessmentOverviewActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

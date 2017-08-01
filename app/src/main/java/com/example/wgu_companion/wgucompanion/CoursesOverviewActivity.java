@@ -1,12 +1,16 @@
 package com.example.wgu_companion.wgucompanion;
 
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 public class CoursesOverviewActivity extends AppCompatActivity {
+
+    private static final int NEW_COURSE_REQUEST_CODE = 2002;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,11 +33,30 @@ public class CoursesOverviewActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         switch(id){
-            case R.id.action_change_program:
-                //deleteAllNotes();
+            case R.id.add_course:
+                addCourse();
+                break;
+            case R.id.view_completed_courses:
+                viewCompleted();
+                break;
+            case R.id.view_remaining_courses:
+                viewRemaining();
                 break;
         }
+        return true;
+    }
 
-        return super.onOptionsItemSelected(item);
+    private void viewRemaining() {
+        Toast.makeText(CoursesOverviewActivity.this, "Filtered to Remaining Courses", Toast.LENGTH_SHORT).show();
+    }
+
+    private void viewCompleted() {
+         Toast.makeText(CoursesOverviewActivity.this, "Filtered to Completed Courses", Toast.LENGTH_SHORT).show();
+    }
+
+    private void addCourse() {
+        Intent menuIntent;
+        menuIntent = new Intent(CoursesOverviewActivity.this, CoursesDetailActivity.class);
+        startActivityForResult(menuIntent, NEW_COURSE_REQUEST_CODE);
     }
 }

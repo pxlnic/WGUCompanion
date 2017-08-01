@@ -5,19 +5,19 @@
     tools:context="com.example.wgu_companion.wgucompanion.HomeActivity">
 
     <item
-        android:id="@id/action_change_program"
+        android:id="@id/add_course"
         android:orderInCategory="101"
         android:title="Add Course"
         app:showAsAction="never" />
 
     <item
-        android:id="@id/action_change_program"
+        android:id="@id/view_completed_courses"
         android:orderInCategory="102"
         android:title="View Completed"
         app:showAsAction="never" />
 
     <item
-        android:id="@id/action_change_program"
+        android:id="@id/view_remaining_courses"
         android:orderInCategory="103"
         android:title="View Remaining"
         app:showAsAction="never" />

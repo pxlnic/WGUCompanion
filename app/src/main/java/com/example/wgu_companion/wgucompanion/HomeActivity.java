@@ -8,9 +8,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.SimpleCursorAdapter;
 
 public class HomeActivity extends AppCompatActivity {
@@ -22,6 +24,7 @@ public class HomeActivity extends AppCompatActivity {
 
     //ListView Declaration
     private ListView mainListView;
+    private RelativeLayout homeLayout;
 
     //Program and CU Text Variables
     private String programName;
@@ -70,6 +73,14 @@ public class HomeActivity extends AppCompatActivity {
                 }
             }
         });
+
+    //Add Program Name/Progress components
+/*        RelativeLayout rl = (RelativeLayout) findViewById(R.id.progress_overview);
+        RelativeLayout.LayoutParams rlParam = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                                                              ViewGroup.LayoutParams.MATCH_PARENT);
+        rlParam.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        homeLayout = (RelativeLayout) findViewById(R.id.home_layout);
+        homeLayout.addView(rl);*/
 
     //Set Program Name
 

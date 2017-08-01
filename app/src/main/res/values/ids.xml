@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="action_change_program" type="id">Change Program</item>
+    <item name="add_term" type="id">Add Term</item>
+    <item name="add_course" type="id">Add Course</item>
+    <item name="view_completed_courses" type="id">View Completed Courses</item>
+    <item name="view_remaining_courses" type="id">View Remaining Courses</item>
+    <item name="add_assessment" type="id">Add Assessment</item>
+    <item name="view_completed_assessments" type="id">View Completed Assessments</item>
+    <item name="view_remaining_assessments" type="id">View Remaining Assessments</item>
+    <item name="course_assessments_list" type="id">Course Assessment List</item>
+    <item name="course_mentor_list" type="id">Course Mentor List</item>
 </resources>

@@ -5,7 +5,7 @@
     tools:context="com.example.wgu_companion.wgucompanion.TermsOverviewActivity">
 
     <item
-        android:id="@id/action_change_program"
+        android:id="@id/add_term"
         android:orderInCategory="101"
         android:title="Add Term"
         app:showAsAction="always"
