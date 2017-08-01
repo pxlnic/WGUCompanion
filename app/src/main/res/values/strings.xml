@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">WGU Companion</string>
+    <string name="main_terms_text">Terms</string>
+    <string name="main_courses_text">Courses</string>
+    <string name="main_assessments_text">Assessments</string>
+    <string name="program_name">Program Name</string>
+</resources>

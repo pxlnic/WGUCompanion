@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_vertical"
+    android:padding="12dp">
+
+    <ImageView
+        android:id="@+id/home_list_icon"
+        android:layout_width="84dp"
+        android:layout_height="84dp"
+        android:src="@drawable/ic_assessment_icon" />
+
+
+    <TextView
+        android:id="@+id/home_list_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:textSize="30sp"
+        android:layout_gravity="center_vertical"
+        android:gravity="center_vertical"
+        android:drawablePadding="12dp"
+        android:textColor="#5f5f5f" />
+
+    <!--<TextView-->
+        <!--android:id="@+id/courses_text"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_margin="12dp"-->
+        <!--android:text="@string/main_courses_text"-->
+        <!--android:textSize="36sp"-->
+        <!--android:layout_gravity="center_vertical"-->
+        <!--android:gravity="center_vertical"-->
+        <!--android:drawableStart="@mipmap/ic_courses_icon"-->
+        <!--android:drawableLeft="@mipmap/ic_courses_icon"-->
+        <!--android:drawablePadding="12dp"/>-->
+
+    <!--<TextView-->
+        <!--android:id="@+id/assessment_text"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_margin="12dp"-->
+        <!--android:text="@string/main_assessments_text"-->
+        <!--android:textSize="36sp"-->
+        <!--android:layout_gravity="center_vertical"-->
+        <!--android:gravity="center_vertical"-->
+        <!--android:drawableStart="@mipmap/ic_assessment_icon"-->
+        <!--android:drawableLeft="@mipmap/ic_assessment_icon"-->
+        <!--android:drawablePadding="12dp"/>-->
+
+</LinearLayout>

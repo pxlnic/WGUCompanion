@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.wgu_companion.wgucompanion.TermsOverviewActivity">
+
+    <item
+        android:id="@id/action_change_program"
+        android:orderInCategory="101"
+        android:title="Add Assessment"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@id/action_change_program"
+        android:orderInCategory="102"
+        android:title="View Completed"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@id/action_change_program"
+        android:orderInCategory="103"
+        android:title="View Remaining"
+        app:showAsAction="never" />
+
+</menu>

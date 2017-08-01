@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.wgu_companion.wgucompanion.TermsOverviewActivity">
+
+    <item
+        android:id="@id/action_change_program"
+        android:orderInCategory="101"
+        android:title="Add Term"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_add_icon"/>
+
+</menu>
