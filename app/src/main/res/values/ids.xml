@@ -21,4 +21,6 @@
     <item name="delete_term" type="id">Delete Term</item>
     <item name="edit_assessment" type="id">Edit Assessment</item>
     <item name="delete_assessment" type="id">Delete Assessment</item>
+    <item name="cu_progress_bar" type="id">CU Progress Bar</item>
+    <item name="action_reset_app" type="id">Reset App</item>
 </resources>

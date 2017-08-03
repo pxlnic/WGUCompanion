@@ -1,12 +1,13 @@
 package com.example.wgu_companion.wgucompanion;
 
-import android.content.ContentValues;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,10 +15,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
+import android.widget.Toast;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -28,14 +28,15 @@ public class HomeActivity extends AppCompatActivity {
 
     //ListView Declaration
     private ListView mainListView;
-    private RelativeLayout homeLayout;
-    private TextView programText;
+    private TextView programTv;
+    private TextView progressTv;
+    private ProgressBar progressB;
 
     //Program and CU Text Variables
-    private String programName;
-    private int completedCUs;
-    private int totalCUs;
-    private String progressText = completedCUs + "/" + totalCUs + " CUs";
+    private String programText;
+    private int completedCUs = 0;
+    private int totalCUs = 0;
+    private String progressText = "";
 
     //Passed Variables
     private int programId;
@@ -58,8 +59,7 @@ public class HomeActivity extends AppCompatActivity {
         mainListView = (ListView)findViewById(R.id.main_list_view);
         mainListView.setAdapter(adapter);
 
-    //Inserting Test Data
-        insertTest();
+    //Verifying DataBase Creation
         verifyDataInsert();
 
     //Click Events
@@ -86,35 +86,36 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-        //Set Program Name
-        Uri uri = CompanionContentProvider.PROGRAM_URI;
-        String filter = DBHelper.PROGRAM_ID + "=" + 1;
-        Cursor cursor = getContentResolver().query(uri, DBHelper.PROGRAM_COLUMNS, filter, null, null);
-        cursor.moveToFirst();
-        programName = cursor.getString(cursor.getColumnIndex(DBHelper.PROGRAM_NAME));
-        programText = (TextView) findViewById(R.id.program_name);
-        programText.setText(programName);
-        programText.requestFocus();
 
-    //Set Progress/CU's
+
+        //Load ContentViewLoader
+        ContentViewLoader contentLoader = new ContentViewLoader();
+
+        //Set Program Name
+        programText = contentLoader.loadProgramName(HomeActivity.this);
+        programTv = (TextView) findViewById(R.id.program_name);
+        programTv.setText(programText);
+        programTv.requestFocus();
+
+        //Set Progress/CU's
+        completedCUs = contentLoader.loadCompletedCU(HomeActivity.this);
+        totalCUs = 6;//contentLoader.loadTotalCU(HomeActivity.this);
+        progressText = completedCUs + "/" + totalCUs + " CUs";
+        progressTv = (TextView) findViewById(R.id.cu_progress_count);
+        progressTv.setText(progressText);
+        progressTv.requestFocus();
+
+        //Set ProgressBar
+        progressB = (ProgressBar) findViewById(R.id.cu_progress_bar);
+        progressB.setMax(totalCUs);
+        progressB.setProgress(completedCUs);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_menu, menu);
+        inflater.inflate(R.menu.menu_home, menu);
         return true;
-    }
-
-    private void insertTest() {
-        String text = "Software Development";
-        Log.d("Database", "Test started.");
-        ContentValues value = new ContentValues();
-        Log.d("Database", "Values created");
-        value.put(DBHelper.PROGRAM_NAME, text);
-        Log.d("Database", "Values Put");
-        Uri uri = getContentResolver().insert(CompanionContentProvider.PROGRAM_URI, value);
-        Log.d("Database", uri.toString());
     }
 
     private void verifyDataInsert(){
@@ -134,32 +135,39 @@ public class HomeActivity extends AppCompatActivity {
 
         switch(id){
             case R.id.action_change_program:
-                //deleteAllNotes();
+                changeProgram();
+                break;
+            case R.id.action_reset_app:
+                resetApp();
                 break;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    private void insertData(){
-        //Insert Term
-        ContentValues value = new ContentValues();
-        value.put(DBHelper.TERM_NAME, "Transfer");
-        value.put(DBHelper.TERM_START_DATE, "2017/07/01");
-        value.put(DBHelper.TERM_END_DATE, "2017/12/31");
-        value.put(DBHelper.TERM_START_REMINDER, 1);
-        value.put(DBHelper.TERM_END_REMINDER, 1);
-        value.put(DBHelper.TERM_PROGRAM_ID, 1);
-        getContentResolver().insert(CompanionContentProvider.TERM_URI, value);
+    private void resetApp() {
+        DialogInterface.OnClickListener confirmDelete =
+                new DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog, int button) {
+                        if(button == DialogInterface.BUTTON_POSITIVE){
+                            CompanionContentProvider c = new CompanionContentProvider();
 
-        //Insert Course
+                            Toast.makeText(HomeActivity.this,
+                                    getString(R.string.app_reset),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                };
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getString(R.string.are_you_sure))
+                .setPositiveButton(getString(android.R.string.yes), confirmDelete)
+                .setNegativeButton(getString(android.R.string.no), confirmDelete)
+                .show();
+    }
 
-        //Insert Assessment
-
-
-        //Insert Mentor
-
+    private void changeProgram() {
 
     }
 }

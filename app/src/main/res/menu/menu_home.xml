@@ -8,7 +8,12 @@
         android:id="@id/action_change_program"
         android:orderInCategory="101"
         android:title="Change Program"
-        app:showAsAction="always"
-        android:icon="@drawable/ic_edit_icon"/>
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@id/action_reset_app"
+        android:title="Reset Data"
+        android:orderInCategory="102"
+        app:showAsAction="never"/>
 
 </menu>

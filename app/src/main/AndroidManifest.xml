@@ -22,9 +22,9 @@
             android:parentActivityName=".HomeActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.wgu_companion.wgucompanion.AssessmentOverviewActivity" />
+                android:value="com.example.wgu_companion.wgucompanion.HomeActivity" />
         </activity>
-        />
+
         <activity
             android:name=".CoursesOverviewActivity"
             android:label="Courses"
@@ -33,7 +33,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.wgu_companion.wgucompanion.HomeActivity" />
         </activity>
-        />
+
         <activity
             android:name=".AssessmentOverviewActivity"
             android:label="Assessments"

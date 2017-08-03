@@ -22,7 +22,7 @@
         android:layout_marginBottom="12dp"/>
 
     <TextView
-        android:id="@+id/cu_progress_count"
+        android:id="@id/cu_progress_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="100/122 CUs"
@@ -34,15 +34,15 @@
     <ProgressBar
         android:id="@+id/cu_progress_bar"
         style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/cu_progress_count"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
         android:layout_marginTop="4dp"
-        android:layout_marginBottom="12dp"/>
+        android:layout_marginBottom="12dp"
+        android:progressTint="@color/colorTheme"
+        android:progressBackgroundTint="@color/colorGray"/>
 
     <android.support.v7.widget.ListViewCompat
         android:id="@+id/main_list_view"

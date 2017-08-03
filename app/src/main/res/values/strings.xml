@@ -4,4 +4,6 @@
     <string name="main_courses_text">Courses</string>
     <string name="main_assessments_text">Assessments</string>
     <string name="program_name">Program Name</string>
+    <string name="app_reset">App Data Reset</string>
+    <string name="are_you_sure">Are you sure?</string>
 </resources>
