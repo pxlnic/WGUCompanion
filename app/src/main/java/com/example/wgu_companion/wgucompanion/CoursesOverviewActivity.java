@@ -11,6 +11,7 @@ import android.widget.Toast;
 public class CoursesOverviewActivity extends AppCompatActivity {
 
     private static final int NEW_COURSE_REQUEST_CODE = 2002;
+    private static String action = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,8 +56,13 @@ public class CoursesOverviewActivity extends AppCompatActivity {
     }
 
     private void addCourse() {
+        action = "insert";
         Intent menuIntent;
         menuIntent = new Intent(CoursesOverviewActivity.this, CoursesDetailActivity.class);
         startActivityForResult(menuIntent, NEW_COURSE_REQUEST_CODE);
+    }
+
+    public static String getCourseAction(){
+        return action;
     }
 }

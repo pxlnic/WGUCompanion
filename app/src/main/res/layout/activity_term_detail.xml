@@ -54,15 +54,35 @@
                 android:layout_marginBottom="12dp"
                 android:layout_marginTop="4dp" />
 
+            <TextView
+                android:id="@+id/term_detail_start_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Start: "
+                android:layout_below="@id/term_cu_progress_bar"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:textSize="15sp"/>
+
+            <TextView
+                android:id="@+id/term_detail_end_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="End: "
+                android:layout_below="@id/term_detail_start_text"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:textSize="15sp"/>
+
             <android.support.v7.widget.ListViewCompat
                 android:id="@+id/term_detail_list_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@+id/term_cu_progress_bar"
+                android:layout_below="@+id/term_detail_end_text"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_marginTop="8dp"
-                tools:listitem="@layout/courses_list_items">
+                tools:listitem="@layout/list_item_course">
 
             </android.support.v7.widget.ListViewCompat>
         </RelativeLayout>

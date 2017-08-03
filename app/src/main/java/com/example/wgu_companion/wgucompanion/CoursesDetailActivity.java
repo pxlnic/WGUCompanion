@@ -6,15 +6,48 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import static com.example.wgu_companion.wgucompanion.CoursesOverviewActivity.getCourseAction;
 
 public class CoursesDetailActivity extends AppCompatActivity {
 
     private static final int ADD_NOTE_REQUEST_CODE = 3001;
 
+    //Content Views
+    private TextView courseName;
+
+    //Strings for SQLite Updates
+    private String courseNameText;
+
+    //Activity Variables
+    private String courseAction = getCourseAction();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_courses_detail);
+
+        //Course Name Header Text Editor
+        courseName = (TextView) findViewById(R.id.course_detail_name_header);
+
+        courseName.setOnClickListener(new View.OnClickListener(){
+           public void onClick(View v){
+               String passedText = courseName.getText().toString();
+               EditContent editText = new EditContent();
+               courseNameText = editText.editText(CoursesDetailActivity.this, "Course # - Course Name", passedText);
+
+               switch(passedText.length()){
+                   case 0:
+                       Toast.makeText(CoursesDetailActivity.this,"New Course added", Toast.LENGTH_SHORT).show();
+                       break;
+
+               }
+           }
+        });
     }
 
     @Override

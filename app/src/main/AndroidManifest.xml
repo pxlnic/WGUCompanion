@@ -76,6 +76,11 @@
                 android:value="com.example.wgu_companion.wgucompanion.AssessmentOverviewActivity"/>
         </activity>
 
+        <provider
+            android:name=".CompanionContentProvider"
+            android:authorities="come.example.wgu_companion.companioncontentprovider"
+            android:exported="false" />
+
     </application>
 
 </manifest>

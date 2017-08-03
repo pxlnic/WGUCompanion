@@ -37,7 +37,6 @@ public class CompanionContentProvider extends ContentProvider {
     public static final Uri COURSE_MENTOR_URI = Uri.parse("content://" + AUTHORITY + "/" + COURSE_MENTOR_PATH);
     public static final Uri NOTE_URI = Uri.parse("content://" + AUTHORITY + "/" + NOTE_PATH);
     public static final Uri STATUS_URI = Uri.parse("content://" + AUTHORITY + "/" + STATUS_PATH);
-    public static final Uri STATUS_TYPE_URI = Uri.parse("content://" + AUTHORITY + "/" + STATUS_TYPE_PATH);
 
     //Add URI Calls
     private static final int PROGRAM = 1;
@@ -58,8 +57,6 @@ public class CompanionContentProvider extends ContentProvider {
     private static final int NOTE_ID = 16;
     private static final int STATUS = 17;
     private static final int STATUS_ID = 18;
-    private static final int STATUS_TYPE = 19;
-    private static final int STATUS_TYPE_ID = 20;
 
     private static UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -82,11 +79,9 @@ public class CompanionContentProvider extends ContentProvider {
         matcher.addURI(AUTHORITY, NOTE_PATH + "/#", NOTE_ID);
         matcher.addURI(AUTHORITY, STATUS_PATH, STATUS);
         matcher.addURI(AUTHORITY, STATUS_PATH + "/#", STATUS_ID);
-        matcher.addURI(AUTHORITY, STATUS_TYPE_PATH, STATUS_TYPE);
-        matcher.addURI(AUTHORITY, STATUS_TYPE_PATH + "/#", STATUS_TYPE_ID);
     }
 
-    SQLiteDatabase companionDb;
+    private SQLiteDatabase companionDb;
 
     @Override
     public boolean onCreate() {
@@ -100,53 +95,75 @@ public class CompanionContentProvider extends ContentProvider {
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+        Cursor cursor = null;
 
         switch(matcher.match(uri)){
+            case PROGRAM:
+                cursor = companionDb.query(DBHelper.TABLE_PROGRAM, DBHelper.PROGRAM_COLUMNS, selection, null, null, null, DBHelper.PROGRAM_ID + " DESC");
+                break;
             case PROGRAM_ID:
-                qb.setTables(DBHelper.TABLE_PROGRAM);
-                qb.appendWhere(DBHelper.PROGRAM_ID + "=" + uri.getLastPathSegment());
+                selection = DBHelper.PROGRAM_ID + "=" + uri.getLastPathSegment();
+                cursor = companionDb.query(DBHelper.TABLE_PROGRAM, DBHelper.PROGRAM_COLUMNS, selection, null, null, null, DBHelper.PROGRAM_ID + " DESC");
+                break;
+            case TERM:
+                cursor = companionDb.query(DBHelper.TABLE_TERM, DBHelper.TERM_COLUMNS, selection, null, null, null, DBHelper.TERM_ID + " DESC");
                 break;
             case TERM_ID:
-                qb.setTables(DBHelper.TABLE_TERM);
-                qb.appendWhere(DBHelper.TERM_ID + "=" + uri.getLastPathSegment());
+                selection = DBHelper.TERM_ID + "=" + uri.getLastPathSegment();
+                cursor = companionDb.query(DBHelper.TABLE_TERM, DBHelper.TERM_COLUMNS, selection, null, null, null, DBHelper.TERM_ID + " DESC");
+                break;
+            case COURSE:
+                cursor = companionDb.query(DBHelper.TABLE_COURSE, DBHelper.COURSE_COLUMNS, selection, null, null, null, DBHelper.COURSE_ID + " DESC");
                 break;
             case COURSE_ID:
-                qb.setTables(DBHelper.TABLE_COURSE);
-                qb.appendWhere(DBHelper.COURSE_ID + "=" + uri.getLastPathSegment());
+                selection = DBHelper.COURSE_ID + "=" + uri.getLastPathSegment();
+                cursor = companionDb.query(DBHelper.TABLE_COURSE, DBHelper.COURSE_COLUMNS, selection, null, null, null, DBHelper.COURSE_ID + " DESC");
+                break;
+            case ASSESSMENT:
+                cursor = companionDb.query(DBHelper.TABLE_ASSESSMENT, DBHelper.ASSESSMENT_COLUMNS, selection, null, null, null, DBHelper.ASSESSMENT_ID + " DESC");
                 break;
             case ASSESSMENT_ID:
-                qb.setTables(DBHelper.TABLE_ASSESSMENT);
-                qb.appendWhere(DBHelper.ASSESSMENT_ID + "=" + uri.getLastPathSegment());
+                selection = DBHelper.ASSESSMENT_ID + "=" + uri.getLastPathSegment();
+                cursor = companionDb.query(DBHelper.TABLE_ASSESSMENT, DBHelper.ASSESSMENT_COLUMNS, selection, null, null, null, DBHelper.ASSESSMENT_ID + " DESC");                break;
+            case ASSESSMENT_TYPE:
+                cursor = companionDb.query(DBHelper.TABLE_ASSESSMENT_TYPE, DBHelper.ASSESSMENT_TYPE_COLUMNS, selection, null, null, null, DBHelper.ASSESSMENT_TYPE_ID + " DESC");
                 break;
             case ASSESSMENT_TYPE_ID:
-                qb.setTables(DBHelper.TABLE_ASSESSMENT_TYPE);
-                qb.appendWhere(DBHelper.ASSESSMENT_TYPE_ID + "=" + uri.getLastPathSegment());
+                selection = DBHelper.ASSESSMENT_TYPE_ID + "=" + uri.getLastPathSegment();
+                cursor = companionDb.query(DBHelper.TABLE_ASSESSMENT_TYPE, DBHelper.ASSESSMENT_TYPE_COLUMNS, selection, null, null, null, DBHelper.ASSESSMENT_TYPE_ID + " DESC");
+                break;
+            case MENTOR:
+                cursor = companionDb.query(DBHelper.TABLE_MENTOR, DBHelper.MENTOR_COLUMNS, selection, null, null, null, DBHelper.MENTOR_ID + " DESC");
                 break;
             case MENTOR_ID:
-                qb.setTables(DBHelper.TABLE_MENTOR);
-                qb.appendWhere(DBHelper.MENTOR_ID + "=" + uri.getLastPathSegment());
+                selection = DBHelper.MENTOR_ID + "=" + uri.getLastPathSegment();
+                cursor = companionDb.query(DBHelper.TABLE_MENTOR, DBHelper.MENTOR_COLUMNS, selection, null, null, null, DBHelper.MENTOR_ID + " DESC");
                 break;
             case COURSE_MENTOR:
-                qb.setTables(DBHelper.TABLE_COURSE_MENTOR);
-                qb.appendWhere(DBHelper.MENTOR_COURSE_ID + "=" + uri.getLastPathSegment());
+                cursor = companionDb.query(DBHelper.TABLE_COURSE_MENTOR, DBHelper.COURSE_MENTOR_COLUMNS, selection, null, null, null, DBHelper.MENTOR_COURSE_ID + " DESC");
+                break;
+            case COURSE_MENTOR_ID:
+                selection = DBHelper.MENTOR_COURSE_ID + "=" + uri.getLastPathSegment();
+                cursor = companionDb.query(DBHelper.TABLE_COURSE_MENTOR, DBHelper.COURSE_MENTOR_COLUMNS, selection, null, null, null, DBHelper.MENTOR_COURSE_ID + " DESC");
                 break;
             case NOTE:
-                qb.setTables(DBHelper.TABLE_NOTE);
-                qb.appendWhere(DBHelper.NOTE_ID + "=" + uri.getLastPathSegment());
+                cursor = companionDb.query(DBHelper.TABLE_NOTE, DBHelper.NOTE_COLUMNS, selection, null, null, null, DBHelper.NOTE_ID + " DESC");
+                break;
+            case NOTE_ID:
+                selection = DBHelper.NOTE_ID + "=" + uri.getLastPathSegment();
+                cursor = companionDb.query(DBHelper.TABLE_NOTE, DBHelper.NOTE_COLUMNS, selection, null, null, null, DBHelper.NOTE_ID + " DESC");
                 break;
             case STATUS:
-                qb.setTables(DBHelper.TABLE_STATUS);
-                qb.appendWhere(DBHelper.STATUS_ID + "=" + uri.getLastPathSegment());
+                cursor = companionDb.query(DBHelper.TABLE_STATUS, DBHelper.STATUS_COLUMNS, selection, null, null, null, DBHelper.STATUS_ID + " DESC");
                 break;
-            case STATUS_TYPE:
-                qb.setTables(DBHelper.TABLE_STATUS_TYPE);
-                qb.appendWhere(DBHelper.STATUS_TYPE_ID + "=" + uri.getLastPathSegment());
+            case STATUS_ID:
+                selection = DBHelper.STATUS_ID + "=" + uri.getLastPathSegment();
+                cursor = companionDb.query(DBHelper.TABLE_STATUS, DBHelper.STATUS_COLUMNS, selection, null, null, null, DBHelper.STATUS_ID + " DESC");
                 break;
             default:
                 Toast.makeText(getContext(), "Query Failed!", Toast.LENGTH_SHORT).show();
+                break;
         }
-        Cursor cursor = qb.query(companionDb, projection, selection, selectionArgs, null, null, sortOrder);
-        cursor.setNotificationUri(getContext().getContentResolver(), uri);
         return cursor;
     }
 
@@ -198,10 +215,6 @@ public class CompanionContentProvider extends ContentProvider {
                 id = companionDb.insert(DBHelper.TABLE_STATUS, null, values);
                 uriString = STATUS_PATH + "/" + id;
                 break;
-            case STATUS_TYPE:
-                id = companionDb.insert(DBHelper.TABLE_STATUS_TYPE, null, values);
-                uriString = STATUS_TYPE_PATH + "/" + id;
-                break;
             default:
                 Toast.makeText(getContext(), "Insert Failed", Toast.LENGTH_SHORT).show();
         }
@@ -239,11 +252,9 @@ public class CompanionContentProvider extends ContentProvider {
             case STATUS:
                 deleted = companionDb.delete(DBHelper.TABLE_STATUS, selection, selectionArgs);
                 break;
-            case STATUS_TYPE:
-                deleted = companionDb.delete(DBHelper.TABLE_STATUS_TYPE, selection, selectionArgs);
-                break;
             default:
                 Toast.makeText(getContext(), "Delete Failed!", Toast.LENGTH_SHORT).show();
+                break;
         }
         return deleted;
     }
@@ -279,12 +290,14 @@ public class CompanionContentProvider extends ContentProvider {
             case STATUS:
                 updated = companionDb.update(DBHelper.TABLE_STATUS, values, selection, selectionArgs);
                 break;
-            case STATUS_TYPE:
-                updated = companionDb.update(DBHelper.TABLE_STATUS_TYPE, values, selection, selectionArgs);
-                break;
             default:
                 Toast.makeText(getContext(), "Update Failed1", Toast.LENGTH_SHORT).show();
+                break;
         }
         return updated;
+    }
+
+    public SQLiteDatabase getDb(){
+        return companionDb;
     }
 }

@@ -9,6 +9,10 @@ import android.view.MenuItem;
 
 public class TermsOverviewActivity extends AppCompatActivity {
 
+    //Activity Variables
+    private int termID;
+    private String action = "";
+
     private static final int NEW_TERM_REQUEST_CODE = 2001;
 
     @Override

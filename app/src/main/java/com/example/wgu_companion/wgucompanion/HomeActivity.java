@@ -1,19 +1,23 @@
 package com.example.wgu_companion.wgucompanion;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -25,6 +29,7 @@ public class HomeActivity extends AppCompatActivity {
     //ListView Declaration
     private ListView mainListView;
     private RelativeLayout homeLayout;
+    private TextView programText;
 
     //Program and CU Text Variables
     private String programName;
@@ -48,10 +53,14 @@ public class HomeActivity extends AppCompatActivity {
                         new HomeItem(R.drawable.ic_assessment_icon, getString(R.string.main_assessments_text))
                 };
 
-        HomeAdapter adapter = new HomeAdapter(this, R.layout.main_list_items, home_item_data);
+        HomeAdapter adapter = new HomeAdapter(this, R.layout.lsit_item_main, home_item_data);
 
         mainListView = (ListView)findViewById(R.id.main_list_view);
         mainListView.setAdapter(adapter);
+
+    //Inserting Test Data
+        insertTest();
+        verifyDataInsert();
 
     //Click Events
         mainListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
@@ -77,16 +86,15 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-    //Add Program Name/Progress components
-/*        RelativeLayout rl = (RelativeLayout) findViewById(R.id.progress_overview);
-        RelativeLayout.LayoutParams rlParam = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                                                              ViewGroup.LayoutParams.MATCH_PARENT);
-        rlParam.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-        homeLayout = (RelativeLayout) findViewById(R.id.home_layout);
-        homeLayout.addView(rl);*/
-
-    //Set Program Name
-
+        //Set Program Name
+        Uri uri = CompanionContentProvider.PROGRAM_URI;
+        String filter = DBHelper.PROGRAM_ID + "=" + 1;
+        Cursor cursor = getContentResolver().query(uri, DBHelper.PROGRAM_COLUMNS, filter, null, null);
+        cursor.moveToFirst();
+        programName = cursor.getString(cursor.getColumnIndex(DBHelper.PROGRAM_NAME));
+        programText = (TextView) findViewById(R.id.program_name);
+        programText.setText(programName);
+        programText.requestFocus();
 
     //Set Progress/CU's
     }
@@ -96,6 +104,25 @@ public class HomeActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_menu, menu);
         return true;
+    }
+
+    private void insertTest() {
+        String text = "Software Development";
+        Log.d("Database", "Test started.");
+        ContentValues value = new ContentValues();
+        Log.d("Database", "Values created");
+        value.put(DBHelper.PROGRAM_NAME, text);
+        Log.d("Database", "Values Put");
+        Uri uri = getContentResolver().insert(CompanionContentProvider.PROGRAM_URI, value);
+        Log.d("Database", uri.toString());
+    }
+
+    private void verifyDataInsert(){
+        Cursor c = getContentResolver().query(CompanionContentProvider.STATUS_URI, DBHelper.STATUS_COLUMNS, null, null,
+                DBHelper.STATUS_ID + "DESC");
+        int count = c.getCount();
+        c.close();
+        Log.d("Database", "Status Type Row Count: " + count);
     }
 
     @Override
@@ -112,5 +139,27 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void insertData(){
+        //Insert Term
+        ContentValues value = new ContentValues();
+        value.put(DBHelper.TERM_NAME, "Transfer");
+        value.put(DBHelper.TERM_START_DATE, "2017/07/01");
+        value.put(DBHelper.TERM_END_DATE, "2017/12/31");
+        value.put(DBHelper.TERM_START_REMINDER, 1);
+        value.put(DBHelper.TERM_END_REMINDER, 1);
+        value.put(DBHelper.TERM_PROGRAM_ID, 1);
+        getContentResolver().insert(CompanionContentProvider.TERM_URI, value);
+
+        //Insert Course
+
+
+        //Insert Assessment
+
+
+        //Insert Mentor
+
+
     }
 }
