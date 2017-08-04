@@ -41,15 +41,4 @@
         android:text="Dates"
         android:textSize="18sp" />
 
-    <TextView
-        android:id="@+id/term_item_cu_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:gravity="end"
-        android:text="CUs"
-        android:textSize="18sp" />
-
 </RelativeLayout>

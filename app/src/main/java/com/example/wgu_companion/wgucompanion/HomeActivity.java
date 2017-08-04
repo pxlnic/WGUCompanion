@@ -1,9 +1,7 @@
 package com.example.wgu_companion.wgucompanion;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -27,7 +25,7 @@ public class HomeActivity extends AppCompatActivity {
     private static final int ASSESSMENTS_REQUEST_CODE = 1003;
 
     //ListView Declaration
-    private ListView mainListView;
+    private ListView mainLv;
     private TextView programTv;
     private TextView progressTv;
     private ProgressBar progressB;
@@ -39,31 +37,20 @@ public class HomeActivity extends AppCompatActivity {
     private String progressText = "";
 
     //Passed Variables
-    private int programId;
+    private static int programId = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-    //Setup ListView for home screen buttons (go to Terms, Courses, Assessments)
-        HomeItem home_item_data[] = new HomeItem[]
-                {
-                        new HomeItem(R.drawable.ic_terms_logo, getString(R.string.main_terms_text)),
-                        new HomeItem(R.drawable.ic_courses_icon, getString(R.string.main_courses_text)),
-                        new HomeItem(R.drawable.ic_assessment_icon, getString(R.string.main_assessments_text))
-                };
-
-        HomeAdapter adapter = new HomeAdapter(this, R.layout.lsit_item_main, home_item_data);
-
-        mainListView = (ListView)findViewById(R.id.main_list_view);
-        mainListView.setAdapter(adapter);
+        setView();
 
     //Verifying DataBase Creation
         verifyDataInsert();
 
     //Click Events
-        mainListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+        mainLv.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 int item = (int) id;
@@ -85,30 +72,6 @@ public class HomeActivity extends AppCompatActivity {
                 }
             }
         });
-
-
-
-        //Load ContentViewLoader
-        ContentViewLoader contentLoader = new ContentViewLoader();
-
-        //Set Program Name
-        programText = contentLoader.loadProgramName(HomeActivity.this);
-        programTv = (TextView) findViewById(R.id.program_name);
-        programTv.setText(programText);
-        programTv.requestFocus();
-
-        //Set Progress/CU's
-        completedCUs = contentLoader.loadCompletedCU(HomeActivity.this);
-        totalCUs = 6;//contentLoader.loadTotalCU(HomeActivity.this);
-        progressText = completedCUs + "/" + totalCUs + " CUs";
-        progressTv = (TextView) findViewById(R.id.cu_progress_count);
-        progressTv.setText(progressText);
-        progressTv.requestFocus();
-
-        //Set ProgressBar
-        progressB = (ProgressBar) findViewById(R.id.cu_progress_bar);
-        progressB.setMax(totalCUs);
-        progressB.setProgress(completedCUs);
     }
 
     @Override
@@ -116,14 +79,6 @@ public class HomeActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_home, menu);
         return true;
-    }
-
-    private void verifyDataInsert(){
-        Cursor c = getContentResolver().query(CompanionContentProvider.STATUS_URI, DBHelper.STATUS_COLUMNS, null, null,
-                DBHelper.STATUS_ID + "DESC");
-        int count = c.getCount();
-        c.close();
-        Log.d("Database", "Status Type Row Count: " + count);
     }
 
     @Override
@@ -145,13 +100,21 @@ public class HomeActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void verifyDataInsert(){
+        Cursor c = getContentResolver().query(CompanionContentProvider.STATUS_URI, DBHelper.STATUS_COLUMNS, null, null,
+                DBHelper.STATUS_ID + "DESC");
+        int count = c.getCount();
+        c.close();
+        Log.d("Database", "Status Type Row Count: " + count);
+    }
+
     private void resetApp() {
         DialogInterface.OnClickListener confirmDelete =
                 new DialogInterface.OnClickListener(){
                     @Override
                     public void onClick(DialogInterface dialog, int button) {
                         if(button == DialogInterface.BUTTON_POSITIVE){
-                            CompanionContentProvider c = new CompanionContentProvider();
+                            //CompanionContentProvider c = new CompanionContentProvider();
 
                             Toast.makeText(HomeActivity.this,
                                     getString(R.string.app_reset),
@@ -169,5 +132,49 @@ public class HomeActivity extends AppCompatActivity {
 
     private void changeProgram() {
 
+    }
+
+    public static int getProgramId(){
+        return programId;
+    }
+
+    private void setView(){
+        //Setup ListView for home screen buttons (go to Terms, Courses, Assessments)
+        HomeItem home_item_data[] = new HomeItem[]
+                {
+                        new HomeItem(R.drawable.ic_terms_logo, getString(R.string.main_terms_text)),
+                        new HomeItem(R.drawable.ic_courses_icon, getString(R.string.main_courses_text)),
+                        new HomeItem(R.drawable.ic_assessment_icon, getString(R.string.main_assessments_text))
+                };
+
+        HomeAdapter adapter = new HomeAdapter(this, R.layout.lsit_item_main, home_item_data);
+
+        mainLv = (ListView)findViewById(R.id.main_list_view);
+        mainLv.setAdapter(adapter);
+
+        //Load ContentViewLoader
+        ContentViewLoader contentLoader = new ContentViewLoader();
+
+        //Set Program Name
+        programText = contentLoader.loadProgramName(HomeActivity.this);
+        programTv = (TextView) findViewById(R.id.program_name);
+        programTv.setText(programText);
+        programTv.requestFocus();
+
+        //Set Program ID to pass
+        programId = contentLoader.loadProgramID(HomeActivity.this);
+
+        //Set Progress/CU's
+        completedCUs = contentLoader.loadCompletedCU(HomeActivity.this);
+        totalCUs = contentLoader.loadTotalCU(HomeActivity.this);
+        progressText = completedCUs + "/" + totalCUs + " CUs";
+        progressTv = (TextView) findViewById(R.id.cu_progress_count);
+        progressTv.setText(progressText);
+        progressTv.requestFocus();
+
+        //Set ProgressBar
+        progressB = (ProgressBar) findViewById(R.id.cu_progress_bar);
+        progressB.setMax(totalCUs);
+        progressB.setProgress(completedCUs);
     }
 }

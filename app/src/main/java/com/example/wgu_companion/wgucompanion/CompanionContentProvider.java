@@ -59,6 +59,11 @@ public class CompanionContentProvider extends ContentProvider {
 
     private static UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
 
+    public static final String TERM_ITEM_TYPE = "Term";
+    public static final String COURSE_ITEM_TYPE = "Course";
+    public static final String ASSESSMENT_ITEM_TYPE = "Assessment";
+    public static final String MENTOR_ITEM_TYPE = "Mentor";
+
     static{
         matcher.addURI(AUTHORITY, PROGRAM_PATH, PROGRAM);
         matcher.addURI(AUTHORITY, PROGRAM_PATH + "/#", PROGRAM_ID);

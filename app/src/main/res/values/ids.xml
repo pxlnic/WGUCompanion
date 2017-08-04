@@ -23,4 +23,5 @@
     <item name="delete_assessment" type="id">Delete Assessment</item>
     <item name="cu_progress_bar" type="id">CU Progress Bar</item>
     <item name="action_reset_app" type="id">Reset App</item>
+    <item name="course_item_name_text" type="id">Course Item Name Text</item>
 </resources>

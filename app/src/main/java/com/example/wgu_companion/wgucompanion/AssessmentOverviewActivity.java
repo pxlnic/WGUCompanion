@@ -44,7 +44,7 @@ public class AssessmentOverviewActivity extends AppCompatActivity {
                 break;
         }
 
-        return true;
+        return super.onOptionsItemSelected(item);
     }
 
     private void viewRemaining() {

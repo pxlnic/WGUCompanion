@@ -198,14 +198,14 @@ public class DBHelper extends SQLiteOpenHelper {
         //Create Initial Term
         db.execSQL("INSERT INTO " + TABLE_TERM + " (" + TERM_NAME + ", " + TERM_PROGRAM_ID + ", " + TERM_STATUS_ID + ", " +
             TERM_START_DATE + ", " + TERM_END_DATE + ", " + TERM_START_REMINDER + ", " + TERM_END_REMINDER + ") VALUES " +
-            "('Transfer', 1, 3, '2017/06/30', '2017/06/30', 0, 0);");
+            "('Transfer', 1, 3, '2017-06-30', '2017-06-30', 0, 0);");
         Log.d("Database", "Initial Term Inserted");
 
         //Create Initial Course
         db.execSQL("INSERT INTO " + TABLE_COURSE + " (" + COURSE_NAME + ", " + COURSE_TERM_ID + ", " + COURSE_PROGRAM_ID + ", " +
             COURSE_STATUS_ID + ", " + COURSE_START_DATE + ", " + COURSE_END_DATE + ", " + COURSE_START_REMINDER + ", " +
             COURSE_END_REMINDER + ", " + COURSE_DESCRIPTION + ", " + COURSE_CU_COUNT + ") VALUES" +
-            "('C182 - Introduction to IT', 1, 1, 3, '2017/06/30', '2017/06/30', 0, 0, " +
+            "('C182 - Introduction to IT', 1, 1, 3, '2017-06-30', '2017-06-30', 0, 0, " +
             "'This course introduces students to information technology as a discipline and the various roles and functions of the IT department as business support.', " +
             "3);");
         Log.d("Database", "Initial Course Inserted");

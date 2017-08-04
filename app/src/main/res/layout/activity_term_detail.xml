@@ -44,15 +44,15 @@
             <ProgressBar
                 android:id="@+id/term_cu_progress_bar"
                 style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
                 android:layout_alignParentLeft="true"
-                android:layout_alignParentRight="true"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/term_cu_progress_count"
                 android:layout_marginBottom="12dp"
-                android:layout_marginTop="4dp" />
+                android:layout_marginTop="4dp"
+                android:progressBackgroundTint="@color/colorGray"
+                android:progressTint="@color/colorTheme" />
 
             <TextView
                 android:id="@+id/term_detail_start_text"
