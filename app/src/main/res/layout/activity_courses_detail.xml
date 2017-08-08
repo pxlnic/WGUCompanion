@@ -28,11 +28,12 @@
                 android:paddingBottom="8dp">
 
                 <TextView
-                    android:id="@id/course_detail_name_header"
+                    android:id="@+id/course_detail_name_header"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="4dp"
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:text="Course Name"
@@ -46,17 +47,19 @@
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
                     android:layout_below="@+id/course_detail_name_header"
+                    android:layout_toLeftOf="@+id/course_detail_status_text"
                     android:text="Start Date:"
-                    android:textSize="16sp" />
+                    android:textSize="14sp" />
 
                 <TextView
                     android:id="@+id/course_end_Date_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
                     android:layout_below="@+id/course_start_date_Text"
                     android:text="End Date:"
-                    android:textSize="16sp" />
+                    android:textSize="14sp" />
 
                 <TextView
                     android:id="@+id/course_detail_status_text"
@@ -65,7 +68,8 @@
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentRight="true"
                     android:layout_below="@+id/course_detail_name_header"
-                    android:text="Status" />
+                    android:text="Status"
+                    android:textStyle="bold" />
 
             </RelativeLayout>
 

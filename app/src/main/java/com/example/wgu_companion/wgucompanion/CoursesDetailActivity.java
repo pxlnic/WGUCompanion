@@ -32,7 +32,7 @@ public class CoursesDetailActivity extends AppCompatActivity implements LoaderMa
     CursorAdapter mentorAdapter;
     private static final int ADD_NOTE_REQUEST_CODE = 3001;
     private static final int VIEW_ASSESSMENT_REQUEST_CODE = 2004;
-
+    private static final int VIEW_MENTOR_REQUEST_CODE = 2005;
 
     //Term Name/Progress/Dates Variables
     private String courseNameText = "";
@@ -58,7 +58,7 @@ public class CoursesDetailActivity extends AppCompatActivity implements LoaderMa
 
         Intent intent = getIntent();
 
-        Uri uri = intent.getParcelableExtra(CompanionContentProvider.TERM_ITEM_TYPE);
+        Uri uri = intent.getParcelableExtra(CompanionContentProvider.COURSE_ITEM_TYPE);
 
         if(uri == null){
             action = Intent.ACTION_INSERT;
@@ -68,32 +68,10 @@ public class CoursesDetailActivity extends AppCompatActivity implements LoaderMa
         }
         else{
             action = Intent.ACTION_EDIT;
-            setTitle("Term Details");
+            setTitle("Course Details");
 
             setViews(uri);
         }
-
-        setViews(uri);
-
-        courseAssessmentLv.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-                Intent intent = new Intent(CoursesDetailActivity.this, AssessmentsDetailActivity.class);
-                Uri uri = Uri.parse(CompanionContentProvider.ASSESSMENT_URI + "/" + id);
-                intent.putExtra(CompanionContentProvider.ASSESSMENT_ITEM_TYPE, uri);
-                startActivityForResult(intent, VIEW_ASSESSMENT_REQUEST_CODE);
-            }
-        });
-
-/*        courseMentorLv.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-                Intent intent = new Intent(CoursesDetailActivity.this, AssessmentsDetailActivity.class);
-                Uri uri = Uri.parse(CompanionContentProvider.MENTOR_URI + "/" + id);
-                intent.putExtra(CompanionContentProvider.MENTOR_ITEM_TYPE, uri);
-                startActivityForResult(intent, VIEW_ASSESSMENT_REQUEST_CODE);
-            }
-        });*/
     }
 
     @Override
@@ -143,31 +121,36 @@ public class CoursesDetailActivity extends AppCompatActivity implements LoaderMa
         ContentViewLoader contentLoader = new ContentViewLoader();
 
         //Set Course Name
-        //courseNameText = contentLoader.loadTermName(CoursesDetailActivity.this, uri);
+        courseNameText = contentLoader.loadCourseName(CoursesDetailActivity.this, uri);
         courseTv = (TextView) findViewById(R.id.course_detail_name_header);
         courseTv.setText(courseNameText);
         courseTv.requestFocus();
 
         //Set Course  Start Date
-        //courseStartText = "Start Date: " + contentLoader.loadTermStart(CoursesDetailActivity.this, uri);
+        courseStartText = "Start Date: " + contentLoader.loadCourseStart(CoursesDetailActivity.this, uri);
         courseStartTv = (TextView) findViewById(R.id.course_start_date_Text);
         courseStartTv.setText(courseStartText);
         courseStartTv.requestFocus();
 
-        //Set Course End Date
-        //courseEndText = "Expected End Date: " + contentLoader.loadTermEnd(CoursesDetailActivity.this, uri);
-        courseEndTv = (TextView) findViewById(R.id.course_end_Date_text);
-        courseEndTv.setText(courseEndText);
-        courseEndTv.requestFocus();
-
         //Set Course Status
-        //courseStartText = "Expected End Date: " + contentLoader.loadTermEnd(CoursesDetailActivity.this, uri);
+        courseStatusText = contentLoader.loadCourseStatus(CoursesDetailActivity.this, uri);
         courseStatusTv = (TextView) findViewById(R.id.course_detail_status_text);
         courseStatusTv.setText(courseStatusText);
         courseStatusTv.requestFocus();
 
+        //Set Course End Date
+        if(courseStatusText.equals("Completed")){
+            courseEndText = "End Date: " + contentLoader.loadCourseEnd(CoursesDetailActivity.this, uri);
+        }
+        else {
+            courseEndText = "Expected End Date: " + contentLoader.loadCourseEnd(CoursesDetailActivity.this, uri);
+        }
+        courseEndTv = (TextView) findViewById(R.id.course_end_Date_text);
+        courseEndTv.setText(courseEndText);
+        courseEndTv.requestFocus();
+
         //Set Course Description
-        //courseDescriptionText = "Expected End Date: " + contentLoader.loadTermEnd(CoursesDetailActivity.this, uri);
+        courseDescriptionText = contentLoader.loadCourseDescription(CoursesDetailActivity.this, uri);
         courseDescriptionTv = (TextView) findViewById(R.id.course_detail_description_text);
         courseDescriptionTv.setText(courseDescriptionText);
         courseDescriptionTv.requestFocus();
@@ -176,8 +159,8 @@ public class CoursesDetailActivity extends AppCompatActivity implements LoaderMa
         courseAssessmentLv = (ListView) findViewById(R.id.course_assessments_list);
 
         String[] afrom = {DBHelper.ASSESSMENT_TYPE_ID};
-        int[] ato = {android.R.layout.simple_list_item_1};
-        assessmentAdapter = new SimpleCursorAdapter(this, android.R.id.list, null, afrom, ato, 0);
+        int[] ato = {android.R.id.text1};
+        assessmentAdapter = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_1, null, afrom, ato, 0);
 
         courseAssessmentLv.setAdapter(assessmentAdapter);
 
@@ -185,29 +168,71 @@ public class CoursesDetailActivity extends AppCompatActivity implements LoaderMa
         courseMentorLv = (ListView) findViewById(R.id.course_mentor_list);
 
         String[] mfrom = {DBHelper.MENTOR_NAME};
-        int[] mto = {android.R.layout.simple_list_item_1};
-        mentorAdapter = new SimpleCursorAdapter(this, android.R.id.list, null, mfrom, mto, 0);
+        int[] mto = {android.R.id.text1};
+        mentorAdapter = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_1, null, mfrom, mto, 0);
 
         courseMentorLv.setAdapter(mentorAdapter);
 
-        getLoaderManager().initLoader(0, null, this);
+        getLoaderManager().initLoader(1, null, this);
+        getLoaderManager().initLoader(2, null, this);
+
+        courseAssessmentLv.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id){
+                Intent intent = new Intent(CoursesDetailActivity.this, AssessmentsDetailActivity.class);
+                Uri uri = Uri.parse(CompanionContentProvider.ASSESSMENT_URI + "/" + id);
+                intent.putExtra(CompanionContentProvider.ASSESSMENT_ITEM_TYPE, uri);
+                startActivityForResult(intent, VIEW_ASSESSMENT_REQUEST_CODE);
+            }
+        });
+
+        courseMentorLv.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id){
+                Intent intent = new Intent(CoursesDetailActivity.this, AssessmentsDetailActivity.class);
+                Uri uri = Uri.parse(CompanionContentProvider.MENTOR_URI + "/" + id);
+                intent.putExtra(CompanionContentProvider.MENTOR_ITEM_TYPE, uri);
+                startActivityForResult(intent, VIEW_MENTOR_REQUEST_CODE);
+            }
+        });
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this, CompanionContentProvider.ASSESSMENT_URI,
-                null, null, null, null);
+        CursorLoader returnLoader = null;
+
+        switch(id){
+            case 1:
+                returnLoader = new CursorLoader(this, CompanionContentProvider.ASSESSMENT_URI, null, null, null, null);
+                break;
+            case 2:
+                returnLoader = new CursorLoader(this, CompanionContentProvider.MENTOR_URI, null, null, null, null);
+                break;
+        }
+        return returnLoader;
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        assessmentAdapter.swapCursor(data);
-        mentorAdapter.swapCursor(data);
+        switch(loader.getId()) {
+            case 1:
+                assessmentAdapter.swapCursor(data);
+                break;
+            case 2:
+                mentorAdapter.swapCursor(data);
+                break;
+        }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        assessmentAdapter.swapCursor(null);
-        mentorAdapter.swapCursor(null);
+        switch(loader.getId()) {
+            case 1:
+                assessmentAdapter.swapCursor(null);
+                break;
+            case 2:
+                mentorAdapter.swapCursor(null);
+                break;
+        }
     }
 }

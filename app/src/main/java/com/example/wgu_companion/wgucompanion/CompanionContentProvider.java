@@ -63,6 +63,7 @@ public class CompanionContentProvider extends ContentProvider {
     public static final String COURSE_ITEM_TYPE = "Course";
     public static final String ASSESSMENT_ITEM_TYPE = "Assessment";
     public static final String MENTOR_ITEM_TYPE = "Mentor";
+    public static final String NOTE_ITEM_TYPE = "Note";
 
     static{
         matcher.addURI(AUTHORITY, PROGRAM_PATH, PROGRAM);

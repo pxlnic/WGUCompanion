@@ -1,26 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.widget.RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.widget.RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.wgu_companion.wgucompanion.CourseNotesActivity"
-    android:padding="8dp">
+    android:padding="8dp"
+    tools:context="com.example.wgu_companion.wgucompanion.CourseNotesActivity">
 
-    <TextView
+    <EditText
+        android:id="@+id/course_note_title_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/course_note_title_text"
+        android:hint="Enter title here..."
         android:text="Note Title"
-        android:textSize="18sp"/>
+        android:textSize="18sp" />
 
-    <TextView
+    <EditText
+        android:id="@+id/course_note_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/course_note_title_text"
-        android:hint="Enter note text here."
+        android:hint="Enter note text here..."
         android:maxLines="8"
-        android:paddingTop="4dp"/>
+        android:paddingTop="4dp" />
 
 </android.widget.RelativeLayout>

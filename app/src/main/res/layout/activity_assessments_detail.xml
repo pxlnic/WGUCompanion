@@ -13,42 +13,54 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:textSize="20sp"
+        android:text="Course Name"
         android:textAlignment="center"
-        android:text="Course Name" />
+        android:textSize="20sp" />
 
     <TextView
+        android:id="@+id/assessment_type_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/assessment_course_name_header"
         android:paddingTop="4dp"
-        android:text="Assessment Type"
-        android:id="@+id/assessment_type_text"/>
+        android:layout_toLeftOf=""
+        android:text="Assessment Type" />
 
     <TextView
+        android:id="@+id/assessment_status_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/assessment_type_text"
-        android:text="Due Date"
-        android:paddingTop="4dp"
-        android:id="@+id/assessment_due_date_text"/>
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/assessment_course_name_header"
+        android:text="Status" />
 
     <TextView
+        android:id="@+id/assessment_due_date_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/assessment_type_text"
+        android:paddingTop="4dp"
+        android:text="Due Date" />
+
+    <TextView
+        android:id="@+id/assessment_detail_notes_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/assessment_due_date_text"
-        android:text="Notes"
-        android:textSize="18sp"
         android:paddingTop="4dp"
-        android:id="@+id/assessment_detail_notes_header"/>
+        android:text="Notes"
+        android:textSize="18sp" />
 
     <android.support.v7.widget.ListViewCompat
         android:id="@+id/assessment_detail_note_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/assessment_detail_notes_header"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
+        android:layout_below="@+id/assessment_detail_notes_header"
         android:layout_marginTop="8dp">
 
 

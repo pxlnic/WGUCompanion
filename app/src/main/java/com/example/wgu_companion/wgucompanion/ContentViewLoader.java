@@ -15,7 +15,7 @@ public class ContentViewLoader {
 
     }
 
-    //Program Data
+//Program Data
     private String program = "";
     private int programId = 0;
     private int completed = 0;
@@ -71,10 +71,7 @@ public class ContentViewLoader {
         return total;
     }
 
-    //Term Overview Data
-
-
-    //Term Detail Data
+//Term Detail Data
     String term = "";
     String termStart = "";
     String termEnd = "";
@@ -145,12 +142,147 @@ public class ContentViewLoader {
         return termTotal;
     }
 
-    //Course Data
+//Save New/Edited Term Data
 
-    //Assessment Data
 
-    //Note Data
+//Course Detail Data
+    private String courseName = "";
+    private String courseStart = "";
+    private String courseEnd = "";
+    private String courseStatus = "";
+    private String courseDescription = "";
 
+    public String loadCourseName(Context c, Uri id){
+        courseName = "";
+        Uri uri = CompanionContentProvider.COURSE_URI;
+        String filter = DBHelper.COURSE_ID + " = " + id.getLastPathSegment();
+        Cursor cursor = c.getContentResolver().query(uri, DBHelper.COURSE_COLUMNS, filter, null, null);
+        cursor.moveToFirst();
+        courseName = cursor.getString(cursor.getColumnIndex(DBHelper.COURSE_NAME));
+
+        return courseName;
+    }
+
+    public String loadCourseStart(Context c, Uri id){
+        courseStart= "";
+        Uri uri = CompanionContentProvider.COURSE_URI;
+        String filter = DBHelper.COURSE_ID + " = " + id.getLastPathSegment();
+        Cursor cursor = c.getContentResolver().query(uri, DBHelper.COURSE_COLUMNS, filter, null, null);
+        cursor.moveToFirst();
+        courseStart = cursor.getString(cursor.getColumnIndex(DBHelper.COURSE_START_DATE));
+
+        return courseStart;
+    }
+
+    public String loadCourseEnd(Context c, Uri id){
+        courseEnd= "";
+        Uri uri = CompanionContentProvider.COURSE_URI;
+        String filter = DBHelper.COURSE_ID + " = " + id.getLastPathSegment();
+        Cursor cursor = c.getContentResolver().query(uri, DBHelper.COURSE_COLUMNS, filter, null, null);
+        cursor.moveToFirst();
+        courseEnd = cursor.getString(cursor.getColumnIndex(DBHelper.COURSE_END_DATE));
+
+        return courseEnd;
+    }
+
+    public String loadCourseStatus(Context c, Uri id){
+        courseStatus= "";
+        Uri uri = CompanionContentProvider.COURSE_URI;
+        String filter = DBHelper.COURSE_ID + " = " + id.getLastPathSegment();
+        Cursor cursor = c.getContentResolver().query(uri, DBHelper.COURSE_COLUMNS, filter, null, null);
+        cursor.moveToFirst();
+        int courseStatusId = cursor.getInt(cursor.getColumnIndex(DBHelper.COURSE_STATUS_ID));
+
+        courseStatus = loadStatus(c, courseStatusId);
+
+        return courseStatus;
+    }
+
+    public String loadCourseDescription(Context c, Uri id){
+        courseDescription= "";
+        Uri uri = CompanionContentProvider.COURSE_URI;
+        String filter = DBHelper.COURSE_ID + " = " + id.getLastPathSegment();
+        Cursor cursor = c.getContentResolver().query(uri, DBHelper.COURSE_COLUMNS, filter, null, null);
+        cursor.moveToFirst();
+        courseDescription = cursor.getString(cursor.getColumnIndex(DBHelper.COURSE_DESCRIPTION));
+
+        return courseDescription;
+    }
+
+//Save New/Edited Course Data
+
+//Assessment Detail Data
+    private String assessmentCourseName = "";
+    private String assessmentType = "";
+    private String assessmentDueDate = "";
+
+    public String loadAssessmentCourseName(Context c, Uri id){
+        assessmentCourseName = "";
+        Uri uri = CompanionContentProvider.ASSESSMENT_URI;
+        String filter = DBHelper.ASSESSMENT_ID + " = " + id.getLastPathSegment();
+        Cursor cursor = c.getContentResolver().query(uri, DBHelper.ASSESSMENT_COLUMNS, filter, null, null);
+        cursor.moveToFirst();
+        int assessmentCourseId = cursor.getInt(cursor.getColumnIndex(DBHelper.ASSESSMENT_COURSE_ID));
+
+        Uri courseUri = Uri.parse(CompanionContentProvider.COURSE_URI + "/" + assessmentCourseId);
+        assessmentCourseName = loadCourseName(c, courseUri);
+
+        return assessmentCourseName;
+    }
+
+    public String loadAssessmentType(Context c, Uri id){
+        assessmentType = "";
+        Uri uri = CompanionContentProvider.ASSESSMENT_URI;
+        String filter = DBHelper.ASSESSMENT_ID + " = " + id.getLastPathSegment();
+        Cursor cursor = c.getContentResolver().query(uri, DBHelper.ASSESSMENT_COLUMNS, filter, null, null);
+        cursor.moveToFirst();
+        int assessmentTypeId = cursor.getInt(cursor.getColumnIndex(DBHelper.ASSESSMENT_A_TYPE_ID));
+
+        assessmentType = loadType(c, assessmentTypeId);
+
+        return assessmentType;
+    }
+
+    public String loadAssessmentDueDate(Context c, Uri id){
+        assessmentDueDate = "";
+        Uri uri = CompanionContentProvider.ASSESSMENT_URI;
+        String filter = DBHelper.ASSESSMENT_ID + " = " + id.getLastPathSegment();
+        Cursor cursor = c.getContentResolver().query(uri, DBHelper.ASSESSMENT_COLUMNS, filter, null, null);
+        cursor.moveToFirst();
+        assessmentDueDate = cursor.getString(cursor.getColumnIndex(DBHelper.ASSESSMENT_DUE_DATE));
+
+        return assessmentDueDate;
+    }
+
+//Save New/Edited Assessment Data
+
+//Note Data
+    private String noteTitle = "";
+    private String noteText = "";
+
+    public String loadNoteTitle(Context c, Uri id){
+        noteTitle = "";
+        Uri uri = CompanionContentProvider.NOTE_URI;
+        String filter = DBHelper.NOTE_ID + " = " + id.getLastPathSegment();
+        Cursor cursor = c.getContentResolver().query(uri, DBHelper.NOTE_COLUMNS, filter, null, null);
+        cursor.moveToFirst();
+        noteTitle = cursor.getString(cursor.getColumnIndex(DBHelper.NOTE_TITLE));
+
+        return noteTitle;
+    }
+
+    public String loadNoteText(Context c, Uri id){
+        noteText = "";
+        Uri uri = CompanionContentProvider.NOTE_URI;
+        String filter = DBHelper.NOTE_ID + " = " + id.getLastPathSegment();
+        Cursor cursor = c.getContentResolver().query(uri, DBHelper.NOTE_COLUMNS, filter, null, null);
+        cursor.moveToFirst();
+        noteText = cursor.getString(cursor.getColumnIndex(DBHelper.NOTE_TEXT));
+
+        return noteText;
+    }
+
+//Other Getter Methods
     //Date Conversions
     public String convertDate(String date) throws ParseException {
         SimpleDateFormat fromDate = new SimpleDateFormat("yyyy-mm-dd");
@@ -162,5 +294,27 @@ public class ContentViewLoader {
         String formattedDate = toDate.format(temp);
 
         return formattedDate;
+    }
+
+    public String loadStatus(Context statusContext, int statusId){
+        String statusName = "";
+        Uri statusUri = CompanionContentProvider.STATUS_URI;
+        String statusFilter = DBHelper.STATUS_ID + " = " + statusId;
+        Cursor statusCursor = statusContext.getContentResolver().query(statusUri, DBHelper.STATUS_COLUMNS, statusFilter, null, null);
+        statusCursor.moveToFirst();
+        statusName = statusCursor.getString(statusCursor.getColumnIndex(DBHelper.STATUS_NAME));
+
+        return statusName;
+    }
+
+    public String loadType(Context typeContext, int typeId){
+        String typeName = "";
+        Uri typeUri = CompanionContentProvider.ASSESSMENT_TYPE_URI;
+        String typeFilter = DBHelper.ASSESSMENT_TYPE_ID + " = " + typeId;
+        Cursor typeCursor = typeContext.getContentResolver().query(typeUri, DBHelper.ASSESSMENT_TYPE_COLUMNS, typeFilter, null, null);
+        typeCursor.moveToFirst();
+        typeName = typeCursor.getString(typeCursor.getColumnIndex(DBHelper.ASSESSMENT_TYPE_NAME));
+
+        return typeName;
     }
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.widget.RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<android.widget.RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -82,7 +82,8 @@
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_marginTop="8dp"
-                tools:listitem="@layout/list_item_course">
+                tools:listitem="@layout/list_item_course"
+                android:isScrollContainer="false">
 
             </android.support.v7.widget.ListViewCompat>
         </RelativeLayout>
