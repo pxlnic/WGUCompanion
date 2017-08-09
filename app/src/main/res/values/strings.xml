@@ -6,4 +6,10 @@
     <string name="program_name">Program Name</string>
     <string name="app_reset">App Data Reset</string>
     <string name="are_you_sure">Are you sure?</string>
+
+    <string-array name="term_status_array">
+        <item>Not Attempted</item>
+        <item>In Progress</item>
+        <item>Completed</item>
+    </string-array>
 </resources>

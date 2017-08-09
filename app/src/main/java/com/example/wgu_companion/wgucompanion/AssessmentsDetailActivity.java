@@ -33,11 +33,13 @@ public class AssessmentsDetailActivity extends AppCompatActivity implements Load
     private String assessmentCourseNameText = "";
     private String assessmentTypeText = "";
     private String assessmentExpectedDueDateText = "";
+    private String assessmentStatusText = "";
 
     //View Declarations
     TextView assessmentCourseTv;
     TextView assessmentTypeTv;
     TextView assessmentEndTv;
+    TextView assessmentStatusTv;
     ListView assessmentNotesLv;
 
     @Override
@@ -134,6 +136,12 @@ public class AssessmentsDetailActivity extends AppCompatActivity implements Load
         assessmentEndTv = (TextView) findViewById(R.id.assessment_due_date_text);
         assessmentEndTv.setText(assessmentExpectedDueDateText);
         assessmentEndTv.requestFocus();
+
+        //Set Assessment Status
+        assessmentStatusText = contentLoader.loadAssessmentStatus(AssessmentsDetailActivity.this, uri);
+        assessmentStatusTv = (TextView) findViewById(R.id.assessment_status_text);
+        assessmentStatusTv.setText(assessmentStatusText);
+        assessmentStatusTv.requestFocus();
 
         //Set Assessment Notes ListView
         assessmentNotesLv = (ListView) findViewById(R.id.assessment_detail_note_list);

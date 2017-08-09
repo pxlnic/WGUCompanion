@@ -97,7 +97,7 @@ public class ContentViewLoader {
         Cursor cursor = c.getContentResolver().query(uri, DBHelper.TERM_COLUMNS, filter, null, null);
         cursor.moveToFirst();
         termStart = cursor.getString(cursor.getColumnIndex(DBHelper.TERM_START_DATE));
-        Log.d("Load Data", "Term Name: " + termStart);
+        Log.d("Load Data", "Term Start Date: " + termStart);
 
         return termStart;
     }
@@ -109,7 +109,7 @@ public class ContentViewLoader {
         Cursor cursor = c.getContentResolver().query(uri, DBHelper.TERM_COLUMNS, filter, null, null);
         cursor.moveToFirst();
         termEnd = cursor.getString(cursor.getColumnIndex(DBHelper.TERM_END_DATE));
-        Log.d("Load Data", "Term Start Date: " + termEnd);
+        Log.d("Load Data", "Term End Date: " + termEnd);
 
         return termEnd;
     }
@@ -215,6 +215,7 @@ public class ContentViewLoader {
     private String assessmentCourseName = "";
     private String assessmentType = "";
     private String assessmentDueDate = "";
+    private String assessmentStatus = "";
 
     public String loadAssessmentCourseName(Context c, Uri id){
         assessmentCourseName = "";
@@ -252,6 +253,19 @@ public class ContentViewLoader {
         assessmentDueDate = cursor.getString(cursor.getColumnIndex(DBHelper.ASSESSMENT_DUE_DATE));
 
         return assessmentDueDate;
+    }
+
+    public String loadAssessmentStatus(Context c, Uri id){
+        assessmentStatus = "";
+        Uri uri = CompanionContentProvider.ASSESSMENT_URI;
+        String filter = DBHelper.ASSESSMENT_ID + " = " + id.getLastPathSegment();
+        Cursor cursor = c.getContentResolver().query(uri, DBHelper.ASSESSMENT_COLUMNS, filter, null, null);
+        cursor.moveToFirst();
+        int statusId = cursor.getInt(cursor.getColumnIndex(DBHelper.ASSESSMENT_STATUS_ID));
+
+        assessmentStatus = loadStatus(c, statusId);
+
+        return assessmentStatus;
     }
 
 //Save New/Edited Assessment Data

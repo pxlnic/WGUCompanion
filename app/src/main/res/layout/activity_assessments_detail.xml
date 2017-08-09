@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.widget.RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<android.widget.RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -19,11 +19,12 @@
 
     <TextView
         android:id="@+id/assessment_type_text"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/assessment_course_name_header"
+        android:layout_toLeftOf="@+id/assessment_status_text"
+        android:layout_toStartOf="@+id/assessment_status_text"
         android:paddingTop="4dp"
-        android:layout_toLeftOf=""
         android:text="Assessment Type" />
 
     <TextView
@@ -33,7 +34,8 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_below="@id/assessment_course_name_header"
-        android:text="Status" />
+        android:text="Status"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/assessment_due_date_text"

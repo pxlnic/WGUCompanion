@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.widget.Toast;
 
 public class CompanionContentProvider extends ContentProvider {
@@ -128,7 +129,8 @@ public class CompanionContentProvider extends ContentProvider {
                 break;
             case ASSESSMENT_ID:
                 selection = DBHelper.ASSESSMENT_ID + "=" + uri.getLastPathSegment();
-                cursor = companionDb.query(DBHelper.TABLE_ASSESSMENT, DBHelper.ASSESSMENT_COLUMNS, selection, null, null, null, DBHelper.ASSESSMENT_ID + " DESC");                break;
+                cursor = companionDb.query(DBHelper.TABLE_ASSESSMENT, DBHelper.ASSESSMENT_COLUMNS, selection, null, null, null, DBHelper.ASSESSMENT_ID + " DESC");
+                break;
             case ASSESSMENT_TYPE:
                 cursor = companionDb.query(DBHelper.TABLE_ASSESSMENT_TYPE, DBHelper.ASSESSMENT_TYPE_COLUMNS, selection, null, null, null, DBHelper.ASSESSMENT_TYPE_ID + " DESC");
                 break;
@@ -303,5 +305,11 @@ public class CompanionContentProvider extends ContentProvider {
 
     public SQLiteDatabase getDb(){
         return companionDb;
+    }
+
+    public Cursor loadCourseItem(){
+        Log.d("Load Data", "DB: " + companionDb);
+        Cursor c = companionDb.rawQuery(DBHelper.FULL_COURSE_TABLE, null);
+        return c;
     }
 }

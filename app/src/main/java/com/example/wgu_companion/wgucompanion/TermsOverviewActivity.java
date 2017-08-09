@@ -1,5 +1,6 @@
 package com.example.wgu_companion.wgucompanion;
 
+import android.app.Dialog;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -15,9 +16,19 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TermsOverviewActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
@@ -83,9 +94,53 @@ public class TermsOverviewActivity extends AppCompatActivity implements LoaderMa
     }
 
     private void addTerm() {
-        Intent menuIntent;
-        menuIntent = new Intent(TermsOverviewActivity.this, TermDetailActivity.class);
-        startActivityForResult(menuIntent, NEW_TERM_REQUEST_CODE);
+        //New Term Variables to pass
+        String termNameText = "";
+        String termStatusText = "";
+        String termStartText = "";
+        Boolean termStartReminder = false;
+        String termEndText = "";
+        Boolean termEndReminder = false;
+        List<String> statusArray = new ArrayList<>();
+        statusArray.add("Note Attempted");
+        statusArray.add("In Progress");
+        statusArray.add("Completed");
+
+
+        final Dialog addTermDialog = new Dialog(TermsOverviewActivity.this);
+        addTermDialog.setContentView(R.layout.edit_term_data);
+
+    //Set Custom Dialog Components
+        //Term Name
+        EditText termNameEt = (EditText) findViewById(R.id.term_edit_name_field);
+
+        //Term Status
+        Spinner termStatusSpin = (Spinner) addTermDialog.findViewById(R.id.term_edit_status_spinner);
+        ArrayAdapter<String> termStatusAdapter = new ArrayAdapter<>(addTermDialog.getContext(),
+                android.R.layout.simple_spinner_item,
+                getResources().getStringArray(R.array.term_status_array));
+        termStatusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        termStatusSpin.setAdapter(termStatusAdapter);
+
+        //Term Start
+        EditText termStartEt = (EditText) findViewById(R.id.term_edit_start_field);
+        CheckBox termStartChk = (CheckBox) findViewById(R.id.term_edit_start_checkbox);
+
+        //Term End
+        EditText termEndtEt = (EditText) findViewById(R.id.term_edit_end_field);
+        CheckBox termEndChk = (CheckBox) findViewById(R.id.term_edit_end_checkbox);
+
+        //Term Course List
+        ListView termCourseLv = (ListView) findViewById(R.id.term_edit_course_list);
+
+        //Buttons
+        Button termSubmitBtn = (Button) findViewById(R.id.term_edit_submit_button);
+
+        Button termCancelBtn = (Button) findViewById(R.id.term_edit_cancel_button);
+
+
+
+        addTermDialog.show();
     }
 
     private void setViews(){

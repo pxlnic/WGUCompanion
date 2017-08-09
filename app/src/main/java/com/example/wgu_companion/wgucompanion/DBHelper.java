@@ -1,6 +1,7 @@
 package com.example.wgu_companion.wgucompanion;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -51,7 +52,6 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String COURSE_END_REMINDER = "course_end_reminder";
     public static final String COURSE_DESCRIPTION = "course_description";
     public static final String COURSE_CU_COUNT = "course_cu_count";
-
 
     //Assessment Columns
     public static final String ASSESSMENT_ID = "_id";
@@ -245,5 +245,32 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NOTE);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_STATUS);
         onCreate(db);
+    }
+
+    public static final String FULL_TERM_TABLE = "SELECT * FROM " + TABLE_TERM + " WHERE";
+    public static final String FULL_COURSE_TABLE = "SELECT " + TABLE_COURSE + "." + COURSE_ID + ", " + TABLE_COURSE + "." + COURSE_NAME + ", " +
+            TABLE_COURSE + "." + COURSE_START_DATE + ", " + TABLE_COURSE + "." + COURSE_TERM_ID + ", " +
+            TABLE_COURSE + "." + COURSE_STATUS_ID + ", " + TABLE_STATUS + "." + STATUS_NAME + " " +
+            "FROM " + TABLE_COURSE + " LEFT JOIN " + TABLE_STATUS + " ON " +
+            TABLE_COURSE + "." + COURSE_STATUS_ID + " = " +
+            TABLE_STATUS + "." + STATUS_ID + ";";
+
+    public static final String TEST = "SELECT " + TABLE_COURSE + ".*, " + TABLE_STATUS + "." + STATUS_NAME +
+            " FROM " + TABLE_COURSE +
+            " LEFT JOIN " + TABLE_STATUS +
+            " ON (" + TABLE_STATUS + "." + STATUS_ID + " = " + TABLE_COURSE + "." + COURSE_STATUS_ID + ");";
+
+    public Cursor test(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor c = db.rawQuery(TEST, null);
+/*        c.moveToFirst();
+        String[] array = c.getColumnNames();
+        for(int i = 0; i < array.length; i++) {
+            Log.d("Load Data", "Column Names: " + array[i]);
+            Log.d("Load Data", "Row Data: " + c.getString(i));
+        }
+        Log.d("Load Data", "Row Data: " + c.getString(11));*/
+
+        return c;
     }
 }

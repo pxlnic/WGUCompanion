@@ -5,6 +5,7 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
@@ -29,7 +30,9 @@ public class TermDetailActivity extends AppCompatActivity implements LoaderManag
     private static final int VIEW_COURSE_REQUEST_CODE = 2003;
     //Activity Variables
     private String action = "";
-    CursorAdapter adapter;
+    CourseViewCursorAdapter adapter;
+    Uri tempUri = null;
+    CompanionContentProvider provider = new CompanionContentProvider();
 
     //Term Name/Progress/Dates Variables
     private String termNameText = "";
@@ -63,8 +66,10 @@ public class TermDetailActivity extends AppCompatActivity implements LoaderManag
             //Load dialog to enter information
         }
         else{
+            Log.d("Load Data", "URI: " + uri);
             action = Intent.ACTION_EDIT;
             setTitle("Term Details");
+            tempUri = uri;
 
             setViews(uri);
         }
@@ -107,7 +112,9 @@ public class TermDetailActivity extends AppCompatActivity implements LoaderManag
     }
 
     private void deleteTerm() {
-
+        int id = Integer.parseInt(tempUri.getLastPathSegment());
+        String filter = DBHelper.TERM_ID + " = " + id;
+        getContentResolver().delete(CompanionContentProvider.TERM_URI, filter, null);
     }
 
     private void editTerm() {
@@ -116,6 +123,7 @@ public class TermDetailActivity extends AppCompatActivity implements LoaderManag
 
     private void setViews(Uri uri){
         ContentViewLoader contentLoader = new ContentViewLoader();
+        CompanionContentProvider termDetailProvider = new CompanionContentProvider();
 
         //Set Term Name
         termNameText = contentLoader.loadTermName(TermDetailActivity.this, uri);
@@ -153,9 +161,19 @@ public class TermDetailActivity extends AppCompatActivity implements LoaderManag
         //Set ListView
         termCourseLv = (ListView) findViewById(R.id.term_detail_list_view);
 
-        String[] from = {DBHelper.COURSE_NAME, DBHelper.COURSE_START_DATE};
-        int[] to = {R.id.course_item_name_text, R.id.course_item_dates_text};
-        adapter = new SimpleCursorAdapter(this, R.layout.list_item_course, null, from, to, 0);
+        DBHelper helper = new DBHelper(TermDetailActivity.this);
+        //SQLiteDatabase db = helper.getWritableDatabase();
+        //Log.d("Load Data", "DB: " + db);
+
+        Cursor termCourseCursor = helper.test();
+        termCourseCursor.moveToFirst();
+        String[] array = termCourseCursor.getColumnNames();
+        Log.d("Load Data", "# of Columns: " + array.length);
+        for(int i = 0; i < array.length; i++){
+            Log.d("Load Data", "Column Name: " + array[i]);
+            Log.d("Load Data", "Row Data:" + termCourseCursor.getString(i));
+        }
+        adapter = new CourseViewCursorAdapter(TermDetailActivity.this, termCourseCursor);
 
         termCourseLv.setAdapter(adapter);
 
