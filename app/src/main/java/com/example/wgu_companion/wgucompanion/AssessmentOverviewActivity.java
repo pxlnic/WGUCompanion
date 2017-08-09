@@ -128,7 +128,7 @@ public class AssessmentOverviewActivity extends AppCompatActivity implements Loa
         //Load Terms
         assessmentOverviewLv = (ListView) findViewById(R.id.assessments_overview_list_view);
 
-        String[] from = {DBHelper.ASSESSMENT_COURSE_ID, DBHelper.ASSESSMENT_A_TYPE_ID, DBHelper.ASSESSMENT_STATUS_ID};
+        String[] from = {DBHelper.ASSESSMENT_COURSE_ID, DBHelper.ASSESSMENT_TYPE, DBHelper.ASSESSMENT_STATUS};
         int[] to = {R.id.assessment_item_name_text, R.id.assessment_item_type_text, R.id.assessment_item_status_text};
         adapter = new SimpleCursorAdapter(this, R.layout.list_item_assessment, null, from, to, 0);
 

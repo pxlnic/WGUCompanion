@@ -307,9 +307,9 @@ public class CompanionContentProvider extends ContentProvider {
         return companionDb;
     }
 
-    public Cursor loadCourseItem(){
+/*    public Cursor loadCourseItem(){
         Log.d("Load Data", "DB: " + companionDb);
         Cursor c = companionDb.rawQuery(DBHelper.FULL_COURSE_TABLE, null);
         return c;
-    }
+    }*/
 }

@@ -5,6 +5,7 @@ import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.widget.CursorAdapter;
@@ -30,7 +31,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TermsOverviewActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
+public class TermsOverviewActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     //ListView Declaration
     private ListView termOverviewLv;
@@ -48,6 +49,8 @@ public class TermsOverviewActivity extends AppCompatActivity implements LoaderMa
     private int termID;
     private String action = "";
     private CursorAdapter adapter;
+    private TermCourseListAdapter dialogAdapter;
+    private static final String TERM_PREFS = "Term_Prefs";
 
     private static final int NEW_TERM_REQUEST_CODE = 2001;
     private static final int VIEW_TERM_REQUEST_CODE = 2002;
@@ -59,11 +62,17 @@ public class TermsOverviewActivity extends AppCompatActivity implements LoaderMa
 
         setViews();
 
-        termOverviewLv.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+        termOverviewLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id){
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(TermsOverviewActivity.this, TermDetailActivity.class);
                 Uri uri = Uri.parse(CompanionContentProvider.TERM_URI + "/" + id);
+
+                SharedPreferences passedUri = getSharedPreferences(TERM_PREFS, 0);
+                SharedPreferences.Editor editor = passedUri.edit();
+                editor.putLong("termUri", id);
+                editor.commit();
+
                 intent.putExtra(CompanionContentProvider.TERM_ITEM_TYPE, uri);
                 startActivityForResult(intent, VIEW_TERM_REQUEST_CODE);
             }
@@ -85,7 +94,7 @@ public class TermsOverviewActivity extends AppCompatActivity implements LoaderMa
         int id = item.getItemId();
 
 
-        switch(id){
+        switch (id) {
             case R.id.add_term:
                 addTerm();
                 break;
@@ -110,7 +119,7 @@ public class TermsOverviewActivity extends AppCompatActivity implements LoaderMa
         final Dialog addTermDialog = new Dialog(TermsOverviewActivity.this);
         addTermDialog.setContentView(R.layout.edit_term_data);
 
-    //Set Custom Dialog Components
+        //Set Custom Dialog Components
         //Term Name
         EditText termNameEt = (EditText) findViewById(R.id.term_edit_name_field);
 
@@ -131,7 +140,14 @@ public class TermsOverviewActivity extends AppCompatActivity implements LoaderMa
         CheckBox termEndChk = (CheckBox) findViewById(R.id.term_edit_end_checkbox);
 
         //Term Course List
-        ListView termCourseLv = (ListView) findViewById(R.id.term_edit_course_list);
+        ListView termCourseLv = (ListView) addTermDialog.findViewById(R.id.term_edit_course_list);
+
+        Cursor termCourseCursor = getContentResolver().query(CompanionContentProvider.COURSE_URI, DBHelper.COURSE_COLUMNS,
+                null, null, null);
+        termCourseCursor.moveToFirst();
+
+        dialogAdapter = new TermCourseListAdapter(TermsOverviewActivity.this, termCourseCursor);
+        termCourseLv.setAdapter(dialogAdapter);
 
         //Buttons
         Button termSubmitBtn = (Button) findViewById(R.id.term_edit_submit_button);
@@ -139,11 +155,10 @@ public class TermsOverviewActivity extends AppCompatActivity implements LoaderMa
         Button termCancelBtn = (Button) findViewById(R.id.term_edit_cancel_button);
 
 
-
         addTermDialog.show();
     }
 
-    private void setViews(){
+    private void setViews() {
         //Load ContentViewLoader
         ContentViewLoader contentLoader = new ContentViewLoader();
 

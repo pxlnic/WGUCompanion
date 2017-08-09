@@ -34,7 +34,8 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String TERM_ID = "_id";
     public static final String TERM_NAME = "term_name";
     public static final String TERM_PROGRAM_ID = "term_program_id";
-    public static final String TERM_STATUS_ID = "term_status";
+    //public static final String TERM_STATUS_ID = "term_status";
+    public static final String TERM_STATUS = "term_status";
     public static final String TERM_START_DATE = "term_start_date";
     public static final String TERM_END_DATE = "term_end_date";
     public static final String TERM_START_REMINDER = "term_start_reminder";
@@ -45,7 +46,8 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String COURSE_NAME = "course_name";
     public static final String COURSE_TERM_ID = "course_term_id";
     public static final String COURSE_PROGRAM_ID = "course_program_id";
-    public static final String COURSE_STATUS_ID = "course_status_id";
+    //public static final String COURSE_STATUS_ID = "course_status_id";
+    public static final String COURSE_STATUS = "course_status";
     public static final String COURSE_START_DATE = "course_start_date";
     public static final String COURSE_END_DATE = "course_end_date";
     public static final String COURSE_START_REMINDER = "course_start_reminder";
@@ -56,8 +58,10 @@ public class DBHelper extends SQLiteOpenHelper {
     //Assessment Columns
     public static final String ASSESSMENT_ID = "_id";
     public static final String ASSESSMENT_COURSE_ID = "assessment_course_id";
-    public static final String ASSESSMENT_A_TYPE_ID = "assessment_type_id";
-    public static final String ASSESSMENT_STATUS_ID = "assessment_status_id";
+    //public static final String ASSESSMENT_A_TYPE_ID = "assessment_type_id";
+    public static final String ASSESSMENT_TYPE = "assessment_type";
+    //public static final String ASSESSMENT_STATUS_ID = "assessment_status_id";
+    public static final String ASSESSMENT_STATUS = "assessment_status";
     public static final String ASSESSMENT_DUE_DATE = "assessment_due_date";
 
     //Assessment Type Columns
@@ -88,12 +92,12 @@ public class DBHelper extends SQLiteOpenHelper {
 
     //SQL Column Arrays for all Tables
     public static final String[] PROGRAM_COLUMNS = {PROGRAM_ID, PROGRAM_NAME, PROGRAM_DEGREE_TYPE};
-    public static final String[] TERM_COLUMNS = {TERM_ID, TERM_NAME, TERM_PROGRAM_ID, TERM_STATUS_ID, TERM_START_DATE, TERM_END_DATE,
+    public static final String[] TERM_COLUMNS = {TERM_ID, TERM_NAME, TERM_PROGRAM_ID, TERM_STATUS, TERM_START_DATE, TERM_END_DATE,
             TERM_START_REMINDER, TERM_END_REMINDER};
-    public static final String[] COURSE_COLUMNS = {COURSE_ID, COURSE_NAME, COURSE_TERM_ID, COURSE_PROGRAM_ID, COURSE_STATUS_ID,
+    public static final String[] COURSE_COLUMNS = {COURSE_ID, COURSE_NAME, COURSE_TERM_ID, COURSE_PROGRAM_ID, COURSE_STATUS,
             COURSE_START_DATE, COURSE_END_DATE, COURSE_START_REMINDER, COURSE_END_REMINDER,
             COURSE_DESCRIPTION, COURSE_CU_COUNT};
-    public static final String[] ASSESSMENT_COLUMNS = {ASSESSMENT_ID, ASSESSMENT_COURSE_ID, ASSESSMENT_A_TYPE_ID, ASSESSMENT_STATUS_ID,
+    public static final String[] ASSESSMENT_COLUMNS = {ASSESSMENT_ID, ASSESSMENT_COURSE_ID, ASSESSMENT_TYPE, ASSESSMENT_STATUS,
             ASSESSMENT_DUE_DATE};
     public static final String[] ASSESSMENT_TYPE_COLUMNS = {ASSESSMENT_TYPE_ID, ASSESSMENT_TYPE_NAME};
     public static final String[] MENTOR_COLUMNS = {MENTOR_ID, MENTOR_NAME, MENTOR_PHONE, MENTOR_EMAIL};
@@ -109,29 +113,29 @@ public class DBHelper extends SQLiteOpenHelper {
     //TERM TABLE
    private static final String TERM_TABLE_CREATE =
             "CREATE TABLE " + TABLE_TERM + " (" + TERM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    TERM_NAME + " TEXT, " + TERM_PROGRAM_ID + " INTEGER, " + TERM_STATUS_ID + " INTEGER, " +
+                    TERM_NAME + " TEXT, " + TERM_PROGRAM_ID + " INTEGER, " + TERM_STATUS + " TEXT, " +
                     TERM_START_DATE + " TEXT, " + TERM_END_DATE + " TEXT, " + TERM_START_REMINDER + " INTEGER, " + TERM_END_REMINDER +
                     " INTEGER, " +
-                    " FOREIGN KEY (" + TERM_PROGRAM_ID + ") REFERENCES " + TABLE_PROGRAM + "(" + PROGRAM_ID + "), " +
-                    " FOREIGN KEY (" + TERM_STATUS_ID + ") REFERENCES " + TABLE_STATUS + "(" + STATUS_ID + "));";
+                    " FOREIGN KEY (" + TERM_PROGRAM_ID + ") REFERENCES " + TABLE_PROGRAM + "(" + PROGRAM_ID + "));";
+                    //" FOREIGN KEY (" + TERM_STATUS_ID + ") REFERENCES " + TABLE_STATUS + "(" + STATUS_ID + "));";
     //COURSE TABLE
    private static final String COURSE_TABLE_CREATE =
             "CREATE TABLE " + TABLE_COURSE + " (" + COURSE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COURSE_NAME + " TEXT, " + COURSE_TERM_ID + " INTEGER, " + COURSE_PROGRAM_ID + " INTEGER, " +
-                    COURSE_STATUS_ID + " INTEGER, " + COURSE_START_DATE + " TEXT, " + COURSE_END_DATE + " TEXT, " +
+                    COURSE_STATUS + " INTEGER, " + COURSE_START_DATE + " TEXT, " + COURSE_END_DATE + " TEXT, " +
                     COURSE_START_REMINDER + " INTEGER, " + COURSE_END_REMINDER + " INTEGER, " + COURSE_DESCRIPTION + " TEXT, " +
                     COURSE_CU_COUNT + " INTEGER, " +
                     " FOREIGN KEY (" + COURSE_TERM_ID + ") REFERENCES " + TABLE_TERM + "(" + TERM_ID + ")," +
-                    " FOREIGN KEY (" + COURSE_PROGRAM_ID + ") REFERENCES " + TABLE_PROGRAM + "(" + PROGRAM_ID + ")," +
-                    " FOREIGN KEY (" + COURSE_STATUS_ID + ") REFERENCES " + TABLE_STATUS + "(" + STATUS_ID + "));";
+                    " FOREIGN KEY (" + COURSE_PROGRAM_ID + ") REFERENCES " + TABLE_PROGRAM + "(" + PROGRAM_ID + "));";
+                    //" FOREIGN KEY (" + COURSE_STATUS_ID + ") REFERENCES " + TABLE_STATUS + "(" + STATUS_ID + "));";
    //ASSESSMENT TABLE
    private static final String ASSESSMENT_TABLE_CREATE =
             "CREATE TABLE " + TABLE_ASSESSMENT + " (" + ASSESSMENT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    ASSESSMENT_COURSE_ID + " INTEGER, " + ASSESSMENT_A_TYPE_ID + " INTEGER, " + ASSESSMENT_STATUS_ID + " INTEGER, " +
+                    ASSESSMENT_COURSE_ID + " INTEGER, " + ASSESSMENT_TYPE + " TEXT, " + ASSESSMENT_STATUS + " TEXT, " +
                     ASSESSMENT_DUE_DATE + " TEXT, " +
-                    " FOREIGN KEY (" + ASSESSMENT_COURSE_ID + ") REFERENCES " + TABLE_COURSE + "(" + COURSE_ID + ")," +
-                    " FOREIGN KEY (" + ASSESSMENT_A_TYPE_ID + ") REFERENCES " + TABLE_ASSESSMENT_TYPE + "(" + ASSESSMENT_TYPE_ID + ")," +
-                    " FOREIGN KEY (" + ASSESSMENT_STATUS_ID + ") REFERENCES " + TABLE_STATUS + "(" + STATUS_ID + "));";
+                    " FOREIGN KEY (" + ASSESSMENT_COURSE_ID + ") REFERENCES " + TABLE_COURSE + "(" + COURSE_ID + "));";
+                    //" FOREIGN KEY (" + ASSESSMENT_A_TYPE_ID + ") REFERENCES " + TABLE_ASSESSMENT_TYPE + "(" + ASSESSMENT_TYPE_ID + ")," +
+                    //" FOREIGN KEY (" + ASSESSMENT_STATUS_ID + ") REFERENCES " + TABLE_STATUS + "(" + STATUS_ID + "));";
     //ASSESSMENT TYPE TABLE
     private static final String ASSESSMENT_TYPE_TABLE_CREATE =
             "CREATE TABLE " + TABLE_ASSESSMENT_TYPE + " (" + ASSESSMENT_TYPE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -196,24 +200,24 @@ public class DBHelper extends SQLiteOpenHelper {
         Log.d("Database", "Initial Program Inserted");
 
         //Create Initial Term
-        db.execSQL("INSERT INTO " + TABLE_TERM + " (" + TERM_NAME + ", " + TERM_PROGRAM_ID + ", " + TERM_STATUS_ID + ", " +
+        db.execSQL("INSERT INTO " + TABLE_TERM + " (" + TERM_NAME + ", " + TERM_PROGRAM_ID + ", " + TERM_STATUS + ", " +
             TERM_START_DATE + ", " + TERM_END_DATE + ", " + TERM_START_REMINDER + ", " + TERM_END_REMINDER + ") VALUES " +
-            "('Transfer', 1, 3, '2017-06-30', '2017-06-30', 0, 0);");
+            "('Transfer', 1, 'Complete', '2017-06-30', '2017-06-30', 0, 0);");
         Log.d("Database", "Initial Term Inserted");
 
         //Create Initial Course
         db.execSQL("INSERT INTO " + TABLE_COURSE + " (" + COURSE_NAME + ", " + COURSE_TERM_ID + ", " + COURSE_PROGRAM_ID + ", " +
-            COURSE_STATUS_ID + ", " + COURSE_START_DATE + ", " + COURSE_END_DATE + ", " + COURSE_START_REMINDER + ", " +
+            COURSE_STATUS + ", " + COURSE_START_DATE + ", " + COURSE_END_DATE + ", " + COURSE_START_REMINDER + ", " +
             COURSE_END_REMINDER + ", " + COURSE_DESCRIPTION + ", " + COURSE_CU_COUNT + ") VALUES" +
-            "('C182 - Introduction to IT', 1, 1, 3, '2017-06-30', '2017-06-30', 0, 0, " +
+            "('C182 - Introduction to IT', 1, 1, 'Complete', '2017-06-30', '2017-06-30', 0, 0, " +
             "'This course introduces students to information technology as a discipline and the various roles and functions of the IT department as business support.', " +
             "3);");
         Log.d("Database", "Initial Course Inserted");
 
         //Create Initial Assessment
-        db.execSQL("INSERT INTO " + TABLE_ASSESSMENT + " (" + ASSESSMENT_COURSE_ID + ", " + ASSESSMENT_A_TYPE_ID + ", " +
-            ASSESSMENT_STATUS_ID + ", " + ASSESSMENT_DUE_DATE + ") VALUES " +
-            "(1, 1, 4, '2017/06/30');");
+        db.execSQL("INSERT INTO " + TABLE_ASSESSMENT + " (" + ASSESSMENT_COURSE_ID + ", " + ASSESSMENT_TYPE + ", " +
+            ASSESSMENT_STATUS + ", " + ASSESSMENT_DUE_DATE + ") VALUES " +
+            "(1, 'Performance', 'Passed', '2017/06/30');");
         Log.d("Database", "Initial Assessment Inserted");
 
         //Create Initial Mentor
@@ -247,7 +251,7 @@ public class DBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public static final String FULL_TERM_TABLE = "SELECT * FROM " + TABLE_TERM + " WHERE";
+/*    public static final String FULL_TERM_TABLE = "SELECT * FROM " + TABLE_TERM + " WHERE";
     public static final String FULL_COURSE_TABLE = "SELECT " + TABLE_COURSE + "." + COURSE_ID + ", " + TABLE_COURSE + "." + COURSE_NAME + ", " +
             TABLE_COURSE + "." + COURSE_START_DATE + ", " + TABLE_COURSE + "." + COURSE_TERM_ID + ", " +
             TABLE_COURSE + "." + COURSE_STATUS_ID + ", " + TABLE_STATUS + "." + STATUS_NAME + " " +
@@ -263,14 +267,14 @@ public class DBHelper extends SQLiteOpenHelper {
     public Cursor test(){
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor c = db.rawQuery(TEST, null);
-/*        c.moveToFirst();
+        c.moveToFirst();
         String[] array = c.getColumnNames();
         for(int i = 0; i < array.length; i++) {
             Log.d("Load Data", "Column Names: " + array[i]);
             Log.d("Load Data", "Row Data: " + c.getString(i));
         }
-        Log.d("Load Data", "Row Data: " + c.getString(11));*/
+        Log.d("Load Data", "Row Data: " + c.getString(11));
 
         return c;
-    }
+    }*/
 }

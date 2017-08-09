@@ -51,7 +51,7 @@ public class ContentViewLoader {
         Cursor cursor = c.getContentResolver().query(uri, DBHelper.COURSE_COLUMNS, null, null, null);
         cursor.moveToFirst();
         for(int i = 0; i < cursor.getCount(); i++){
-            if(cursor.getInt(cursor.getColumnIndex(DBHelper.COURSE_STATUS_ID)) == 3){
+            if(cursor.getString(cursor.getColumnIndex(DBHelper.COURSE_STATUS)).equals("Complete")){
                 completed = completed + cursor.getInt(cursor.getColumnIndex(DBHelper.COURSE_CU_COUNT));
             }
         }
@@ -75,6 +75,7 @@ public class ContentViewLoader {
     String term = "";
     String termStart = "";
     String termEnd = "";
+    String termStatus = "";
     int termCompleted = 0;
     int termTotal = 0;
 
@@ -114,6 +115,18 @@ public class ContentViewLoader {
         return termEnd;
     }
 
+    public String loadTermStatus(Context c, Uri id){
+        termStatus = "";
+        Uri uri = CompanionContentProvider.TERM_URI;
+        String filter = DBHelper.TERM_ID + "=" + id.getLastPathSegment();
+        Cursor cursor = c.getContentResolver().query(uri, DBHelper.TERM_COLUMNS, filter, null, null);
+        cursor.moveToFirst();
+        termStatus = cursor.getString(cursor.getColumnIndex(DBHelper.TERM_STATUS));
+        Log.d("Load Data", "Term Status: " + termStatus);
+
+        return termStatus;
+    }
+
     public int loadTermCompletedCU(Context c, Uri id){
         termCompleted = 0;
         Uri uri = CompanionContentProvider.COURSE_URI;
@@ -121,7 +134,7 @@ public class ContentViewLoader {
         Cursor cursor = c.getContentResolver().query(uri, DBHelper.COURSE_COLUMNS, filter, null, null);
         cursor.moveToFirst();
         for(int i = 0; i < cursor.getCount(); i++){
-            if(cursor.getInt(cursor.getColumnIndex(DBHelper.COURSE_STATUS_ID)) == 3){
+            if(cursor.getString(cursor.getColumnIndex(DBHelper.COURSE_STATUS)).equals("Complete")){
                 termCompleted = termCompleted + cursor.getInt(cursor.getColumnIndex(DBHelper.COURSE_CU_COUNT));
             }
         }
@@ -143,7 +156,52 @@ public class ContentViewLoader {
     }
 
 //Save New/Edited Term Data
+    private int termStartCheck = -1;
+    private int termEndCheck = -1;
+    private int[] termCourseIds;
 
+    public boolean loadTermStartReminder(Context c, Uri id){
+        termStartCheck = -1;
+        Uri uri = CompanionContentProvider.TERM_URI;
+        String filter = DBHelper.TERM_ID + "=" + id.getLastPathSegment();
+        Cursor cursor = c.getContentResolver().query(uri, DBHelper.TERM_COLUMNS, filter, null, null);
+        cursor.moveToFirst();
+        termStartCheck = cursor.getInt(cursor.getColumnIndex(DBHelper.TERM_START_REMINDER));
+
+        boolean isChecked = false;
+        if(termStartCheck == 1){
+            isChecked = true;
+        }
+        Log.d("Load Date", "Term Start Reminder: " + isChecked);
+
+        return isChecked;
+    }
+
+    public boolean loadTermEndReminder(Context c, Uri id){
+        termEndCheck = -1;
+        Uri uri = CompanionContentProvider.TERM_URI;
+        String filter = DBHelper.TERM_ID + "=" + id.getLastPathSegment();
+        Cursor cursor = c.getContentResolver().query(uri, DBHelper.TERM_COLUMNS, filter, null, null);
+        cursor.moveToFirst();
+        termEndCheck = cursor.getInt(cursor.getColumnIndex(DBHelper.TERM_END_REMINDER));
+
+        boolean isChecked = false;
+        if(termEndCheck == 1){
+            isChecked = true;
+        }
+        Log.d("Load Date", "Term Start Reminder: " + isChecked);
+
+        return isChecked;
+    }
+
+    public int[] loadCourseIds(Context c, TermCourseListAdapter a){
+        termCourseIds = new int[a.getCount()];
+        for(int i = 0; i < termCourseIds.length; i++){
+            //termCourseIds[i] = a;
+        }
+
+        return termCourseIds;
+    }
 
 //Course Detail Data
     private String courseName = "";
@@ -191,9 +249,9 @@ public class ContentViewLoader {
         String filter = DBHelper.COURSE_ID + " = " + id.getLastPathSegment();
         Cursor cursor = c.getContentResolver().query(uri, DBHelper.COURSE_COLUMNS, filter, null, null);
         cursor.moveToFirst();
-        int courseStatusId = cursor.getInt(cursor.getColumnIndex(DBHelper.COURSE_STATUS_ID));
+        courseStatus = cursor.getString(cursor.getColumnIndex(DBHelper.COURSE_STATUS));
 
-        courseStatus = loadStatus(c, courseStatusId);
+        //courseStatus = loadStatus(c, courseStatusId);
 
         return courseStatus;
     }
@@ -237,9 +295,9 @@ public class ContentViewLoader {
         String filter = DBHelper.ASSESSMENT_ID + " = " + id.getLastPathSegment();
         Cursor cursor = c.getContentResolver().query(uri, DBHelper.ASSESSMENT_COLUMNS, filter, null, null);
         cursor.moveToFirst();
-        int assessmentTypeId = cursor.getInt(cursor.getColumnIndex(DBHelper.ASSESSMENT_A_TYPE_ID));
+        assessmentType = cursor.getString(cursor.getColumnIndex(DBHelper.ASSESSMENT_TYPE));
 
-        assessmentType = loadType(c, assessmentTypeId);
+        //assessmentType = loadType(c, assessmentTypeId);
 
         return assessmentType;
     }
@@ -261,9 +319,9 @@ public class ContentViewLoader {
         String filter = DBHelper.ASSESSMENT_ID + " = " + id.getLastPathSegment();
         Cursor cursor = c.getContentResolver().query(uri, DBHelper.ASSESSMENT_COLUMNS, filter, null, null);
         cursor.moveToFirst();
-        int statusId = cursor.getInt(cursor.getColumnIndex(DBHelper.ASSESSMENT_STATUS_ID));
+        assessmentStatus = cursor.getString(cursor.getColumnIndex(DBHelper.ASSESSMENT_STATUS));
 
-        assessmentStatus = loadStatus(c, statusId);
+        //assessmentStatus = loadStatus(c, statusId);
 
         return assessmentStatus;
     }

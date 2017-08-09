@@ -1,9 +1,11 @@
 package com.example.wgu_companion.wgucompanion;
 
+import android.app.Dialog;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -17,27 +19,38 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TermDetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
     private static final int VIEW_COURSE_REQUEST_CODE = 2003;
+    private static final String TERM_PREFS = "Term_Prefs";
     //Activity Variables
     private String action = "";
     CourseViewCursorAdapter adapter;
+    TermCourseListAdapter dialogAdapter;
     Uri tempUri = null;
     CompanionContentProvider provider = new CompanionContentProvider();
+    ContentViewLoader contentLoader = new ContentViewLoader();
 
     //Term Name/Progress/Dates Variables
     private String termNameText = "";
     private String termStartText = "";
     private String termEndText = "";
+    private String termStatusText = "";
     private int termCompletedCU = 0;
     private int termTotalCU = 0;
     private String termProgressText = "";
@@ -46,6 +59,7 @@ public class TermDetailActivity extends AppCompatActivity implements LoaderManag
     TextView termTv;
     TextView termStartTv;
     TextView termEndTv;
+    TextView termStatusTv;
     TextView termProgressTv;
     ProgressBar termProgressB;
     ListView termCourseLv;
@@ -118,13 +132,112 @@ public class TermDetailActivity extends AppCompatActivity implements LoaderManag
     }
 
     private void editTerm() {
+        //New Term Variables to pass
+        String dialogTermNameText = termNameText;
+        String dialogTermStatusText = termStatusText;
+        String dialogTermStartText;
+        final Boolean termStartReminder = false;
+        String dialogTermEndText;
+        Boolean termEndReminder = false;
+        List<String> statusArray = new ArrayList<>();
+        statusArray.add("Note Attempted");
+        statusArray.add("In Progress");
+        statusArray.add("Complete");
+
+
+        final Dialog addTermDialog = new Dialog(TermDetailActivity.this);
+        addTermDialog.setContentView(R.layout.edit_term_data);
+
+        //Set Custom Dialog Components
+        //Term Name
+        final EditText termNameEt = (EditText) addTermDialog.findViewById(R.id.term_edit_name_field);
+        termNameEt.setText(dialogTermNameText);
+
+        //Term Status
+        final Spinner termStatusSpin = (Spinner) addTermDialog.findViewById(R.id.term_edit_status_spinner);
+        ArrayAdapter<String> termStatusAdapter = new ArrayAdapter<>(addTermDialog.getContext(),
+                android.R.layout.simple_spinner_item,
+                getResources().getStringArray(R.array.term_status_array));
+        termStatusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        termStatusSpin.setAdapter(termStatusAdapter);
+
+        if (!dialogTermStatusText.equals(null)) {
+            int spinnerPosition = statusArray.indexOf(dialogTermStatusText);
+            Log.d("Load Data", "Position: " + spinnerPosition);
+            termStatusSpin.setSelection(spinnerPosition);
+        }
+
+        //Term Start
+        dialogTermStartText = contentLoader.loadTermStart(TermDetailActivity.this, tempUri);
+        final EditText termStartEt = (EditText) addTermDialog.findViewById(R.id.term_edit_start_field);
+        termStartEt.setText(dialogTermStartText);
+
+        boolean startChecked = contentLoader.loadTermStartReminder(TermDetailActivity.this, tempUri);
+        final CheckBox termStartChk = (CheckBox) addTermDialog.findViewById(R.id.term_edit_start_checkbox);
+        termStartChk.setChecked(startChecked);
+
+        //Term End
+        dialogTermEndText = contentLoader.loadTermEnd(TermDetailActivity.this, tempUri);
+        final EditText termEndEt = (EditText) addTermDialog.findViewById(R.id.term_edit_end_field);
+        termEndEt.setText(dialogTermEndText);
+
+        boolean endChecked = contentLoader.loadTermEndReminder(TermDetailActivity.this, tempUri);
+        final CheckBox termEndChk = (CheckBox) addTermDialog.findViewById(R.id.term_edit_end_checkbox);
+        termEndChk.setChecked(endChecked);
+
+        //Term Course List
+        ListView termCourseLv = (ListView) addTermDialog.findViewById(R.id.term_edit_course_list);
+
+        Cursor termCourseCursor = getContentResolver().query(CompanionContentProvider.COURSE_URI, DBHelper.COURSE_COLUMNS,
+                null, null, null);
+        termCourseCursor.moveToFirst();
+
+        dialogAdapter = new TermCourseListAdapter(TermDetailActivity.this, termCourseCursor);
+        termCourseLv.setAdapter(dialogAdapter);
+
+        //Buttons
+        Button termSubmitBtn = (Button) findViewById(R.id.term_edit_submit_button);
+        termSubmitBtn.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                String submitTermName = termNameEt.getText().toString().trim();
+                String submitTermStatus = termStatusSpin.getSelectedItem().toString().trim();
+                String submitTermStart = termStartEt.getText().toString().trim();
+                int submitTermStartReminder = 0;
+                if(termStartChk.isChecked()){
+                    submitTermStartReminder = 1;
+                }
+                String submitTermEnd = termEndEt.getText().toString().trim();
+                int submitTermEndReminder = 0;
+                if(termEndChk.isChecked()){
+                    submitTermEndReminder = 1;
+                }
+
+                //Get Course ID's
+                int[] courseIds = contentLoader.loadCourseIds(TermDetailActivity.this, dialogAdapter);
+
+                updateTerm();
+            }
+        });
+
+        Button termCancelBtn = (Button) findViewById(R.id.term_edit_cancel_button);
+        termCancelBtn.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                addTermDialog.cancel();
+            }
+        });
+
+        addTermDialog.show();
+    }
+
+    private void updateTerm() {
 
     }
 
     private void setViews(Uri uri){
-        ContentViewLoader contentLoader = new ContentViewLoader();
-        CompanionContentProvider termDetailProvider = new CompanionContentProvider();
-
         //Set Term Name
         termNameText = contentLoader.loadTermName(TermDetailActivity.this, uri);
         termTv = (TextView) findViewById(R.id.term_name);
@@ -136,6 +249,12 @@ public class TermDetailActivity extends AppCompatActivity implements LoaderManag
         termStartTv = (TextView) findViewById(R.id.term_detail_start_text);
         termStartTv.setText(termStartText);
         termStartTv.requestFocus();
+
+        //Set Term Status
+        termStatusText = contentLoader.loadTermStatus(TermDetailActivity.this, uri);
+        termStatusTv = (TextView) findViewById(R.id.term_detail_status_text);
+        termStatusTv.setText(termStatusText);
+        termStatusTv.requestFocus();
 
         //Set Term End Date
         termEndText = "Expected End Date: " + contentLoader.loadTermEnd(TermDetailActivity.this, uri);
@@ -161,11 +280,11 @@ public class TermDetailActivity extends AppCompatActivity implements LoaderManag
         //Set ListView
         termCourseLv = (ListView) findViewById(R.id.term_detail_list_view);
 
-        DBHelper helper = new DBHelper(TermDetailActivity.this);
-        //SQLiteDatabase db = helper.getWritableDatabase();
-        //Log.d("Load Data", "DB: " + db);
+        SharedPreferences pref = getSharedPreferences(TERM_PREFS, 0);
+        Long id = pref.getLong("termUri", -1);
+        String filter = DBHelper.TERM_ID + " = " + id;
 
-        Cursor termCourseCursor = helper.test();
+        Cursor termCourseCursor = getContentResolver().query(CompanionContentProvider.COURSE_URI, DBHelper.COURSE_COLUMNS, filter, null, null);
         termCourseCursor.moveToFirst();
         String[] array = termCourseCursor.getColumnNames();
         Log.d("Load Data", "# of Columns: " + array.length);
