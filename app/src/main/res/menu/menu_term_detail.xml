@@ -7,12 +7,6 @@
         android:id="@id/edit_term"
         android:orderInCategory="101"
         android:title="Edit Term"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@id/delete_term"
-        android:orderInCategory="102"
-        android:title="Delete Term"
-        app:showAsAction="never" />
+        app:showAsAction="always" />
 
 </menu>

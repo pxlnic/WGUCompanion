@@ -1,18 +1,13 @@
 package com.example.wgu_companion.wgucompanion;
 
 import android.app.Dialog;
-import android.app.LoaderManager;
-import android.content.CursorLoader;
+import android.content.ContentValues;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.support.v4.widget.CursorAdapter;
-import android.support.v4.widget.SimpleCursorAdapter;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,24 +22,22 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TermDetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
+public class TermDetailActivity extends AppCompatActivity{
 
     private static final int VIEW_COURSE_REQUEST_CODE = 2003;
-    private static final String TERM_PREFS = "Term_Prefs";
     //Activity Variables
     private String action = "";
-    CourseViewCursorAdapter adapter;
-    TermCourseListAdapter dialogAdapter;
-    Uri tempUri = null;
-    CompanionContentProvider provider = new CompanionContentProvider();
-    ContentViewLoader contentLoader = new ContentViewLoader();
+    private CourseViewCursorAdapter adapter;
+    private TermCourseCursorAdapter dialogAdapter;
+    private Uri tempUri = null;
+    private CompanionContentProvider provider = new CompanionContentProvider();
+    private ContentViewLoader contentLoader = new ContentViewLoader();
+    private List<String> courseIdArray = new ArrayList<>();
 
     //Term Name/Progress/Dates Variables
     private String termNameText = "";
@@ -56,13 +49,13 @@ public class TermDetailActivity extends AppCompatActivity implements LoaderManag
     private String termProgressText = "";
 
     //View Declarations
-    TextView termTv;
-    TextView termStartTv;
-    TextView termEndTv;
-    TextView termStatusTv;
-    TextView termProgressTv;
-    ProgressBar termProgressB;
-    ListView termCourseLv;
+    private TextView termTv;
+    private TextView termStartTv;
+    private TextView termEndTv;
+    private TextView termStatusTv;
+    private TextView termProgressTv;
+    private ProgressBar termProgressB;
+    private ListView termCourseLv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,9 +119,9 @@ public class TermDetailActivity extends AppCompatActivity implements LoaderManag
     }
 
     private void deleteTerm() {
-        int id = Integer.parseInt(tempUri.getLastPathSegment());
-        String filter = DBHelper.TERM_ID + " = " + id;
-        getContentResolver().delete(CompanionContentProvider.TERM_URI, filter, null);
+            int id = Integer.parseInt(tempUri.getLastPathSegment());
+            String filter = DBHelper.TERM_ID + " = " + id;
+            getContentResolver().delete(CompanionContentProvider.TERM_URI, filter, null);
     }
 
     private void editTerm() {
@@ -143,7 +136,6 @@ public class TermDetailActivity extends AppCompatActivity implements LoaderManag
         statusArray.add("Note Attempted");
         statusArray.add("In Progress");
         statusArray.add("Complete");
-
 
         final Dialog addTermDialog = new Dialog(TermDetailActivity.this);
         addTermDialog.setContentView(R.layout.edit_term_data);
@@ -163,7 +155,7 @@ public class TermDetailActivity extends AppCompatActivity implements LoaderManag
 
         if (!dialogTermStatusText.equals(null)) {
             int spinnerPosition = statusArray.indexOf(dialogTermStatusText);
-            Log.d("Load Data", "Position: " + spinnerPosition);
+            Log.d("Load Data", "Spinner Position: " + spinnerPosition);
             termStatusSpin.setSelection(spinnerPosition);
         }
 
@@ -186,42 +178,111 @@ public class TermDetailActivity extends AppCompatActivity implements LoaderManag
         termEndChk.setChecked(endChecked);
 
         //Term Course List
-        ListView termCourseLv = (ListView) addTermDialog.findViewById(R.id.term_edit_course_list);
+        final ListView dialogTermCourseLv = (ListView) addTermDialog.findViewById(R.id.term_edit_course_list);
 
-        Cursor termCourseCursor = getContentResolver().query(CompanionContentProvider.COURSE_URI, DBHelper.COURSE_COLUMNS,
+        final Cursor dialogTermCourseCursor = getContentResolver().query(CompanionContentProvider.COURSE_URI, DBHelper.COURSE_COLUMNS,
                 null, null, null);
-        termCourseCursor.moveToFirst();
+        dialogTermCourseCursor.moveToFirst();
 
-        dialogAdapter = new TermCourseListAdapter(TermDetailActivity.this, termCourseCursor);
-        termCourseLv.setAdapter(dialogAdapter);
+        dialogAdapter = new TermCourseCursorAdapter(TermDetailActivity.this, dialogTermCourseCursor);
+        dialogTermCourseLv.setAdapter(dialogAdapter);
 
         //Buttons
-        Button termSubmitBtn = (Button) findViewById(R.id.term_edit_submit_button);
+        //Submit Button Handler
+        Button termSubmitBtn = (Button) addTermDialog.findViewById(R.id.term_edit_submit_button);
         termSubmitBtn.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
-                String submitTermName = termNameEt.getText().toString().trim();
-                String submitTermStatus = termStatusSpin.getSelectedItem().toString().trim();
-                String submitTermStart = termStartEt.getText().toString().trim();
-                int submitTermStartReminder = 0;
-                if(termStartChk.isChecked()){
-                    submitTermStartReminder = 1;
-                }
-                String submitTermEnd = termEndEt.getText().toString().trim();
-                int submitTermEndReminder = 0;
-                if(termEndChk.isChecked()){
-                    submitTermEndReminder = 1;
+                //Count of courses checked
+                int count = 0;
+                for(int i=0; i<dialogTermCourseLv.getChildCount(); i++){
+                    CheckBox verify;
+                    verify = (CheckBox) dialogTermCourseLv.getChildAt(i).findViewById(R.id.list_item_checkbox);
+                    if (verify.isChecked()) {
+                        count = count+1;
+                        Log.d("Submit Data", "Count: " + count);
+                    }
                 }
 
-                //Get Course ID's
-                int[] courseIds = contentLoader.loadCourseIds(TermDetailActivity.this, dialogAdapter);
+                //Verify at least one course checked
+                if(count>0) {
+                    int termIdToPass = Integer.parseInt(tempUri.getLastPathSegment());
+                    String submitTermName = termNameEt.getText().toString().trim();
+                    String submitTermStatus = termStatusSpin.getSelectedItem().toString().trim();
+                    String submitTermStart = termStartEt.getText().toString().trim();
+                    int submitTermStartReminder = 0;
+                    if (termStartChk.isChecked()) {
+                        submitTermStartReminder = 1;
+                    }
+                    String submitTermEnd = termEndEt.getText().toString().trim();
+                    int submitTermEndReminder = 0;
+                    if (termEndChk.isChecked()) {
+                        submitTermEndReminder = 1;
+                    }
 
-                updateTerm();
+                    //Get Course ID's
+                    List<String> courseIds = contentLoader.loadCourseIds(dialogTermCourseCursor);
+
+                    //Determine if course is checked or unchecked
+                    List<String> courseCheckedValue = new ArrayList<>();
+                    CheckBox cb;
+                    for (int i = 0; i < dialogTermCourseLv.getChildCount(); i++) {
+                        cb = (CheckBox) dialogTermCourseLv.getChildAt(i).findViewById(R.id.list_item_checkbox);
+                        if (cb.isChecked()) {
+                            courseCheckedValue.add("1");
+                        } else {
+                            courseCheckedValue.add("0");
+                        }
+                    }
+
+                    Log.d("Load Data", "Course ID Count: " + courseIds.size());
+
+                    updateTerm(termIdToPass, submitTermName, submitTermStatus, submitTermStart, submitTermStartReminder, submitTermEnd, submitTermEndReminder);
+                    updateCourseTermIds(termIdToPass, courseIds, courseCheckedValue);
+
+                    addTermDialog.cancel();
+                    setViews(tempUri);
+                }
+                //Error if none checked
+                else{
+                    Toast.makeText(TermDetailActivity.this, "At least one course must be selected to submit", Toast.LENGTH_SHORT).show();
+                    Log.d("Submit Data", "At least one course must be selected to submit");
+                }
             }
         });
 
-        Button termCancelBtn = (Button) findViewById(R.id.term_edit_cancel_button);
+        //Delete Button Handler
+        Button termDeleteBtn = (Button) addTermDialog.findViewById(R.id.term_edit_delete_button);
+        termDeleteBtn.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                //Count of courses checked
+                int count = 0;
+                for(int i=0; i<dialogTermCourseLv.getChildCount(); i++){
+                    CheckBox verify;
+                    verify = (CheckBox) dialogTermCourseLv.getChildAt(i).findViewById(R.id.list_item_checkbox);
+                    if (verify.isChecked()) {
+                        count = count+1;
+                        Log.d("Submit Data", "Count: " + count);
+                    }
+                }
+
+                if(count == 0) {
+                    deleteTerm();
+                    addTermDialog.cancel();
+                    Intent intent = new Intent(TermDetailActivity.this, TermsOverviewActivity.class);
+                    startActivity(intent);
+                }
+                else{
+                    Toast.makeText(TermDetailActivity.this, "Cannot delete while courses selected.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        //Cancel Button Handler
+        Button termCancelBtn = (Button) addTermDialog.findViewById(R.id.term_edit_cancel_button);
         termCancelBtn.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -233,14 +294,41 @@ public class TermDetailActivity extends AppCompatActivity implements LoaderManag
         addTermDialog.show();
     }
 
-    private void updateTerm() {
-
+    //Update Term
+    private void updateTerm(int id, String name, String status, String start, int startReminder, String end, int endReminder) {
+        ContentValues values = new ContentValues();
+        String filter = DBHelper.TERM_ID + "=" + id;
+        values.put(DBHelper.TERM_NAME, name);
+        values.put(DBHelper.TERM_STATUS, status);
+        values.put(DBHelper.TERM_START_DATE, start);
+        values.put(DBHelper.TERM_START_REMINDER, startReminder);
+        values.put(DBHelper.TERM_END_DATE, end);
+        values.put(DBHelper.TERM_END_REMINDER, endReminder);
+        getContentResolver().update(CompanionContentProvider.TERM_URI, values, filter, null);
+        Log.d("Load Data", "Update Complete for Term");
     }
 
+    //Update Courses Term ID
+    private void updateCourseTermIds(int id, List<String> courseIds, List<String> courseChecked){
+        for(int i=0; i<courseIds.size(); i++) {
+            ContentValues courseValues = new ContentValues();
+            if(courseChecked.get(i).equals("1")) {
+                courseValues.put(DBHelper.COURSE_TERM_ID, id);
+            }
+            else if(Integer.parseInt(courseIds.get(i))==id){
+                courseValues.put(DBHelper.COURSE_TERM_ID, -99);
+            }
+            String filter = DBHelper.COURSE_ID + "=" + courseIds.get(i);
+            getContentResolver().update(CompanionContentProvider.COURSE_URI, courseValues, filter, null);
+            Log.d("Load Data", "Update Complete for Course ID: " + courseIds.get(i));
+        }
+    }
+
+    //Set View Content
     private void setViews(Uri uri){
         //Set Term Name
         termNameText = contentLoader.loadTermName(TermDetailActivity.this, uri);
-        termTv = (TextView) findViewById(R.id.term_name);
+        termTv = (TextView) findViewById(R.id.term_detail_name);
         termTv.setText(termNameText);
         termTv.requestFocus();
 
@@ -265,8 +353,6 @@ public class TermDetailActivity extends AppCompatActivity implements LoaderManag
         //Set Term Progress Text
         termCompletedCU = contentLoader.loadTermCompletedCU(TermDetailActivity.this, uri);
         termTotalCU = contentLoader.loadTermTotalCU(TermDetailActivity.this, uri);
-        Log.d("Load Data", "Term Completed CUs Loaded: " + termCompletedCU);
-        Log.d("Load Data", "Term Total CUs Loaded: " + termTotalCU);
         termProgressText = termCompletedCU + "/" + termTotalCU + " CUs";
         termProgressTv = (TextView) findViewById(R.id.term_cu_progress_count);
         termProgressTv.setText(termProgressText);
@@ -280,38 +366,14 @@ public class TermDetailActivity extends AppCompatActivity implements LoaderManag
         //Set ListView
         termCourseLv = (ListView) findViewById(R.id.term_detail_list_view);
 
-        SharedPreferences pref = getSharedPreferences(TERM_PREFS, 0);
-        Long id = pref.getLong("termUri", -1);
-        String filter = DBHelper.TERM_ID + " = " + id;
+        SharedPreferences pref = getSharedPreferences(TermsOverviewActivity.TERM_PREFS, 0);
+        Long id = pref.getLong("termUri", 0);
+        String termIdFilter = DBHelper.COURSE_TERM_ID + " = " + id;
 
-        Cursor termCourseCursor = getContentResolver().query(CompanionContentProvider.COURSE_URI, DBHelper.COURSE_COLUMNS, filter, null, null);
+        Cursor termCourseCursor = getContentResolver().query(CompanionContentProvider.COURSE_URI, DBHelper.COURSE_COLUMNS, termIdFilter, null, null);
         termCourseCursor.moveToFirst();
-        String[] array = termCourseCursor.getColumnNames();
-        Log.d("Load Data", "# of Columns: " + array.length);
-        for(int i = 0; i < array.length; i++){
-            Log.d("Load Data", "Column Name: " + array[i]);
-            Log.d("Load Data", "Row Data:" + termCourseCursor.getString(i));
-        }
-        adapter = new CourseViewCursorAdapter(TermDetailActivity.this, termCourseCursor);
+        adapter = new CourseViewCursorAdapter(TermDetailActivity.this, termCourseCursor,0);
 
         termCourseLv.setAdapter(adapter);
-
-        getLoaderManager().initLoader(0, null, this);
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this, CompanionContentProvider.COURSE_URI,
-                null, null, null, null);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        adapter.swapCursor(data);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        adapter.swapCursor(null);
     }
 }

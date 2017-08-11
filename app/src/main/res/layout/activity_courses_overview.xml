@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.wgu_companion.wgucompanion.CoursesOverviewActivity"
-    android:padding="16dp">
+    android:padding="16dp"
+    tools:context="com.example.wgu_companion.wgucompanion.CoursesOverviewActivity">
 
     <TextView
         android:id="@+id/program_name"
@@ -14,41 +14,43 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
+        android:layout_marginBottom="12dp"
         android:text="Program Name"
-        android:textSize="24sp"
-        android:layout_marginBottom="12dp"/>
+        android:textSize="24sp" />
 
     <TextView
         android:id="@+id/cu_progress_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="100/122 CUs"
         android:layout_below="@+id/program_name"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="4dp"
-        android:textSize="22sp"/>
+        android:text="100/122 CUs"
+        android:textSize="22sp" />
 
     <ProgressBar
         android:id="@+id/cu_progress_bar"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/cu_progress_count"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="12dp"/>
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/cu_progress_count"
+        android:layout_marginBottom="12dp"
+        android:layout_marginTop="4dp" />
 
     <android.support.v7.widget.ListViewCompat
         android:id="@+id/courses_overview_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/cu_progress_bar"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="8dp">
+        android:layout_below="@+id/cu_progress_bar"
+        android:layout_marginTop="8dp"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="8dp">
 
 
     </android.support.v7.widget.ListViewCompat>

@@ -212,6 +212,13 @@ public class DBHelper extends SQLiteOpenHelper {
             "('C182 - Introduction to IT', 1, 1, 'Complete', '2017-06-30', '2017-06-30', 0, 0, " +
             "'This course introduces students to information technology as a discipline and the various roles and functions of the IT department as business support.', " +
             "3);");
+
+        db.execSQL("INSERT INTO " + TABLE_COURSE + " (" + COURSE_NAME + ", " + COURSE_TERM_ID + ", " + COURSE_PROGRAM_ID + ", " +
+                COURSE_STATUS + ", " + COURSE_START_DATE + ", " + COURSE_END_DATE + ", " + COURSE_START_REMINDER + ", " +
+                COURSE_END_REMINDER + ", " + COURSE_DESCRIPTION + ", " + COURSE_CU_COUNT + ") VALUES" +
+                "('C393 - IT Foundations', -99, 1, 'Not Attempted', '2017-06-30', '2017-06-30', 0, 0, " +
+                "'This course introduces students to information technology as a discipline and the various roles and functions of the IT department as business support.', " +
+                "3);");
         Log.d("Database", "Initial Course Inserted");
 
         //Create Initial Assessment

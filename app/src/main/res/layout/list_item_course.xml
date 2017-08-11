@@ -4,7 +4,8 @@
     android:layout_height="90dp"
     android:background="#d9d9d6"
     android:orientation="vertical"
-    android:padding="12dp">
+    android:padding="12dp"
+    android:layout_marginBottom="4dp">
 
     <TextView
         android:id="@id/course_item_name_text"

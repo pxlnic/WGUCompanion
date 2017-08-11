@@ -1,17 +1,14 @@
 package com.example.wgu_companion.wgucompanion;
 
 import android.app.Dialog;
-import android.app.LoaderManager;
-import android.content.CursorLoader;
+import android.content.ContentValues;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.v4.widget.CursorAdapter;
-import android.support.v4.widget.SimpleCursorAdapter;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -24,14 +21,13 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TermsOverviewActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class TermsOverviewActivity extends AppCompatActivity{
 
     //ListView Declaration
     private ListView termOverviewLv;
@@ -48,9 +44,11 @@ public class TermsOverviewActivity extends AppCompatActivity implements LoaderMa
     //Activity Variables
     private int termID;
     private String action = "";
-    private CursorAdapter adapter;
-    private TermCourseListAdapter dialogAdapter;
-    private static final String TERM_PREFS = "Term_Prefs";
+    private TermCursorAdapter adapter;
+    private TermCourseCursorAdapter dialogAdapter;
+    public static final String TERM_PREFS = "Term_Prefs";
+    ContentViewLoader contentLoader = new ContentViewLoader();
+    private Uri termUri = null;
 
     private static final int NEW_TERM_REQUEST_CODE = 2001;
     private static final int VIEW_TERM_REQUEST_CODE = 2002;
@@ -96,6 +94,10 @@ public class TermsOverviewActivity extends AppCompatActivity implements LoaderMa
 
         switch (id) {
             case R.id.add_term:
+                SharedPreferences passedUri = getSharedPreferences(TERM_PREFS, 0);
+                SharedPreferences.Editor editor = passedUri.edit();
+                editor.putLong("termUri", -1);
+                editor.commit();
                 addTerm();
                 break;
         }
@@ -103,13 +105,7 @@ public class TermsOverviewActivity extends AppCompatActivity implements LoaderMa
     }
 
     private void addTerm() {
-        //New Term Variables to pass
-        String termNameText = "";
-        String termStatusText = "";
-        String termStartText = "";
-        Boolean termStartReminder = false;
-        String termEndText = "";
-        Boolean termEndReminder = false;
+        //Setup Spinner
         List<String> statusArray = new ArrayList<>();
         statusArray.add("Note Attempted");
         statusArray.add("In Progress");
@@ -121,10 +117,10 @@ public class TermsOverviewActivity extends AppCompatActivity implements LoaderMa
 
         //Set Custom Dialog Components
         //Term Name
-        EditText termNameEt = (EditText) findViewById(R.id.term_edit_name_field);
+        final EditText termNameEt = (EditText) addTermDialog.findViewById(R.id.term_edit_name_field);
 
         //Term Status
-        Spinner termStatusSpin = (Spinner) addTermDialog.findViewById(R.id.term_edit_status_spinner);
+        final Spinner termStatusSpin = (Spinner) addTermDialog.findViewById(R.id.term_edit_status_spinner);
         ArrayAdapter<String> termStatusAdapter = new ArrayAdapter<>(addTermDialog.getContext(),
                 android.R.layout.simple_spinner_item,
                 getResources().getStringArray(R.array.term_status_array));
@@ -132,36 +128,116 @@ public class TermsOverviewActivity extends AppCompatActivity implements LoaderMa
         termStatusSpin.setAdapter(termStatusAdapter);
 
         //Term Start
-        EditText termStartEt = (EditText) findViewById(R.id.term_edit_start_field);
-        CheckBox termStartChk = (CheckBox) findViewById(R.id.term_edit_start_checkbox);
+        final EditText termStartEt = (EditText) addTermDialog.findViewById(R.id.term_edit_start_field);
+        final CheckBox termStartChk = (CheckBox) addTermDialog.findViewById(R.id.term_edit_start_checkbox);
 
         //Term End
-        EditText termEndtEt = (EditText) findViewById(R.id.term_edit_end_field);
-        CheckBox termEndChk = (CheckBox) findViewById(R.id.term_edit_end_checkbox);
+        final EditText termEndEt = (EditText) addTermDialog.findViewById(R.id.term_edit_end_field);
+        final CheckBox termEndChk = (CheckBox) addTermDialog.findViewById(R.id.term_edit_end_checkbox);
 
         //Term Course List
-        ListView termCourseLv = (ListView) addTermDialog.findViewById(R.id.term_edit_course_list);
+        final ListView termCourseLv = (ListView) addTermDialog.findViewById(R.id.term_edit_course_list);
 
-        Cursor termCourseCursor = getContentResolver().query(CompanionContentProvider.COURSE_URI, DBHelper.COURSE_COLUMNS,
+        final Cursor termCourseCursor = getContentResolver().query(CompanionContentProvider.COURSE_URI, DBHelper.COURSE_COLUMNS,
                 null, null, null);
         termCourseCursor.moveToFirst();
 
-        dialogAdapter = new TermCourseListAdapter(TermsOverviewActivity.this, termCourseCursor);
+        dialogAdapter = new TermCourseCursorAdapter(TermsOverviewActivity.this, termCourseCursor);
         termCourseLv.setAdapter(dialogAdapter);
 
         //Buttons
-        Button termSubmitBtn = (Button) findViewById(R.id.term_edit_submit_button);
+        Button termSubmitBtn = (Button) addTermDialog.findViewById(R.id.term_edit_submit_button);
+        termSubmitBtn.setOnClickListener(new View.OnClickListener() {
 
-        Button termCancelBtn = (Button) findViewById(R.id.term_edit_cancel_button);
+            @Override
+            public void onClick(View arg0) {
+                //Count of courses checked
+                int count = 0;
+                for(int i=0; i<termCourseLv.getChildCount(); i++){
+                    CheckBox verify;
+                    verify = (CheckBox) termCourseLv.getChildAt(i).findViewById(R.id.list_item_checkbox);
+                    if (verify.isChecked()) {
+                        count = count+1;
+                    }
+                }
+
+                //Verify at least one course checked
+                if(count>0) {
+                    String submitTermName = termNameEt.getText().toString().trim();
+                    String submitTermStatus = termStatusSpin.getSelectedItem().toString().trim();
+                    String submitTermStart = termStartEt.getText().toString().trim();
+                    int submitTermStartReminder = 0;
+                    if (termStartChk.isChecked()) {
+                        submitTermStartReminder = 1;
+                    }
+                    String submitTermEnd = termEndEt.getText().toString().trim();
+                    int submitTermEndReminder = 0;
+                    if (termEndChk.isChecked()) {
+                        submitTermEndReminder = 1;
+                    }
+
+                    //Get Course ID's
+                    List<String> courseIds = contentLoader.loadCourseIds(termCourseCursor);
+
+                    //Determine if course is checked or unchecked
+                    List<String> courseCheckedValue = new ArrayList<>();
+                    CheckBox cb;
+                    for (int i = 0; i < termCourseLv.getChildCount(); i++) {
+                        cb = (CheckBox) termCourseLv.getChildAt(i).findViewById(R.id.list_item_checkbox);
+                        if (cb.isChecked()) {
+                            courseCheckedValue.add("1");
+                        } else {
+                            courseCheckedValue.add("0");
+                        }
+                    }
+
+                    Log.d("Load Data", "Course ID Count: " + courseIds.size());
+
+                    insertTerm(submitTermName, submitTermStatus, submitTermStart, submitTermStartReminder, submitTermEnd, submitTermEndReminder);
+                    updateCourseTermIds(termUri, courseIds, courseCheckedValue);
+
+                    addTermDialog.cancel();
+                    setViews();
+                }
+                //Error if none checked
+                else{
+                    Toast.makeText(TermsOverviewActivity.this, "At least one course must be selected to submit", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        Button termCancelBtn = (Button) addTermDialog.findViewById(R.id.term_edit_cancel_button);
 
 
         addTermDialog.show();
     }
 
-    private void setViews() {
-        //Load ContentViewLoader
-        ContentViewLoader contentLoader = new ContentViewLoader();
+    private void insertTerm(String name, String status, String start, int startReminder, String end, int endReminder) {
+        ContentValues values = new ContentValues();
+        values.put(DBHelper.TERM_NAME, name);
+        values.put(DBHelper.TERM_STATUS, status);
+        values.put(DBHelper.TERM_START_DATE, start);
+        values.put(DBHelper.TERM_START_REMINDER, startReminder);
+        values.put(DBHelper.TERM_END_DATE, end);
+        values.put(DBHelper.TERM_END_REMINDER, endReminder);
+        termUri = getContentResolver().insert(CompanionContentProvider.TERM_URI, values);
+    }
 
+    //Update Courses Term ID
+    private void updateCourseTermIds(Uri tempUri, List<String> courseIds, List<String> courseChecked){
+        int id = Integer.parseInt(tempUri.getLastPathSegment());
+        for(int i=0; i<courseIds.size(); i++) {
+            ContentValues courseValues = new ContentValues();
+            if(courseChecked.get(i).equals("1")) {
+                courseValues.put(DBHelper.COURSE_TERM_ID, id);
+                String filter = DBHelper.COURSE_ID + "=" + courseIds.get(i);
+                getContentResolver().update(CompanionContentProvider.COURSE_URI, courseValues, filter, null);
+                Log.d("Load Data", "Update Complete for Course ID: " + courseIds.get(i));
+            }
+        }
+    }
+
+    private void setViews() {
         //Set Program Name
         programText = contentLoader.loadProgramName(TermsOverviewActivity.this);
         programTv = (TextView) findViewById(R.id.program_name);
@@ -184,28 +260,10 @@ public class TermsOverviewActivity extends AppCompatActivity implements LoaderMa
         //Load Terms
         termOverviewLv = (ListView) findViewById(R.id.terms_overview_list_view);
 
-        String[] from = {DBHelper.TERM_NAME, DBHelper.TERM_START_DATE};
-        int[] to = {R.id.term_item_name_text, R.id.term_item_dates_text};
-        adapter = new SimpleCursorAdapter(this, R.layout.list_item_term, null, from, to, 0);
+        Cursor termCursor = getContentResolver().query(CompanionContentProvider.TERM_URI, DBHelper.TERM_COLUMNS, null, null, null);
+        termCursor.moveToFirst();
+        adapter = new TermCursorAdapter(TermsOverviewActivity.this, termCursor, 0);
 
         termOverviewLv.setAdapter(adapter);
-
-        getLoaderManager().initLoader(0, null, this);
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this, CompanionContentProvider.TERM_URI,
-                null, null, null, null);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        adapter.swapCursor(data);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        adapter.swapCursor(null);
     }
 }

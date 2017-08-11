@@ -35,7 +35,7 @@ public class CoursesOverviewActivity extends AppCompatActivity implements Loader
 
     //Activity Variables
     private int courseID;
-    private CursorAdapter adapter;
+    private CourseViewCursorAdapter adapter;
 
     private static final int NEW_COURSE_REQUEST_CODE = 2002;
     private static final int VIEW_COURSE_REQUEST_CODE = 2003;
@@ -85,9 +85,9 @@ public class CoursesOverviewActivity extends AppCompatActivity implements Loader
         //Load Terms
         courseOverviewLv = (ListView) findViewById(R.id.courses_overview_list_view);
 
-        String[] from = {DBHelper.COURSE_NAME, DBHelper.COURSE_START_DATE};
-        int[] to = {R.id.course_item_name_text, R.id.course_item_dates_text};
-        adapter = new SimpleCursorAdapter(this, R.layout.list_item_course, null, from, to, 0);
+        Cursor courseCursor = getContentResolver().query(CompanionContentProvider.COURSE_URI, DBHelper.COURSE_COLUMNS, null, null, null);
+        courseCursor.moveToFirst();
+        adapter = new CourseViewCursorAdapter(CoursesOverviewActivity.this, courseCursor,0);
 
         courseOverviewLv.setAdapter(adapter);
 
