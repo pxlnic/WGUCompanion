@@ -13,18 +13,24 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class TermsOverviewActivity extends AppCompatActivity{
@@ -45,7 +51,7 @@ public class TermsOverviewActivity extends AppCompatActivity{
     private int termID;
     private String action = "";
     private TermCursorAdapter adapter;
-    private TermCourseCursorAdapter dialogAdapter;
+    private TermCourseSelectCursorAdapter dialogAdapter;
     public static final String TERM_PREFS = "Term_Prefs";
     ContentViewLoader contentLoader = new ContentViewLoader();
     private Uri termUri = null;
@@ -128,11 +134,11 @@ public class TermsOverviewActivity extends AppCompatActivity{
         termStatusSpin.setAdapter(termStatusAdapter);
 
         //Term Start
-        final EditText termStartEt = (EditText) addTermDialog.findViewById(R.id.term_edit_start_field);
+        final DatePicker termStartPick = (DatePicker) addTermDialog.findViewById(R.id.term_edit_start_picker);
         final CheckBox termStartChk = (CheckBox) addTermDialog.findViewById(R.id.term_edit_start_checkbox);
 
         //Term End
-        final EditText termEndEt = (EditText) addTermDialog.findViewById(R.id.term_edit_end_field);
+        final DatePicker termEndPick = (DatePicker) addTermDialog.findViewById(R.id.term_edit_end_picker);
         final CheckBox termEndChk = (CheckBox) addTermDialog.findViewById(R.id.term_edit_end_checkbox);
 
         //Term Course List
@@ -142,8 +148,10 @@ public class TermsOverviewActivity extends AppCompatActivity{
                 null, null, null);
         termCourseCursor.moveToFirst();
 
-        dialogAdapter = new TermCourseCursorAdapter(TermsOverviewActivity.this, termCourseCursor);
+        dialogAdapter = new TermCourseSelectCursorAdapter(TermsOverviewActivity.this, termCourseCursor);
         termCourseLv.setAdapter(dialogAdapter);
+
+        setDynamicHeight(termCourseLv);
 
         //Buttons
         Button termSubmitBtn = (Button) addTermDialog.findViewById(R.id.term_edit_submit_button);
@@ -165,12 +173,24 @@ public class TermsOverviewActivity extends AppCompatActivity{
                 if(count>0) {
                     String submitTermName = termNameEt.getText().toString().trim();
                     String submitTermStatus = termStatusSpin.getSelectedItem().toString().trim();
-                    String submitTermStart = termStartEt.getText().toString().trim();
+
+                    int pickStartDay = termStartPick.getDayOfMonth();
+                    int pickStartMonth = termStartPick.getMonth() + 1;
+                    int pickStartYear = termStartPick.getYear();
+
+                    String submitTermStart = contentLoader.convertDate(pickStartDay, pickStartMonth, pickStartYear);
+
                     int submitTermStartReminder = 0;
                     if (termStartChk.isChecked()) {
                         submitTermStartReminder = 1;
                     }
-                    String submitTermEnd = termEndEt.getText().toString().trim();
+
+                    int pickEndDay = termEndPick.getDayOfMonth();
+                    int pickEndMonth = termEndPick.getMonth() + 1;
+                    int pickEndYear = termEndPick.getYear();
+
+                    String submitTermEnd = contentLoader.convertDate(pickEndDay, pickEndMonth, pickEndYear);
+
                     int submitTermEndReminder = 0;
                     if (termEndChk.isChecked()) {
                         submitTermEndReminder = 1;
@@ -193,11 +213,42 @@ public class TermsOverviewActivity extends AppCompatActivity{
 
                     Log.d("Load Data", "Course ID Count: " + courseIds.size());
 
-                    insertTerm(submitTermName, submitTermStatus, submitTermStart, submitTermStartReminder, submitTermEnd, submitTermEndReminder);
-                    updateCourseTermIds(termUri, courseIds, courseCheckedValue);
+                    try {
+                        //Get current date and reminder date
+                        Date now = new Date();
+                        Date verifyStart = new SimpleDateFormat("yyyy/MM/dd").parse(submitTermStart);
+                        Date verifyEnd = new SimpleDateFormat("yyyy/MM/dd").parse(submitTermEnd);
+                        String message = "";
 
-                    addTermDialog.cancel();
-                    setViews();
+                        //If reminder checked verify that reminder date is after today
+                        if (submitTermStartReminder == 1) {
+                            if (verifyStart.before(now)) {
+                                message = message + "Start Date must be after today to have a reminder set.";
+                            }
+                        }
+                        if(submitTermEndReminder == 1) {
+                            if(verifyEnd.before(now)){
+                                message = message + "End Date must be after today to have a reminder set";
+                            }
+                        }
+                        if(verifyStart.after(verifyEnd)){
+                            message = message + "Start date cannot be after End date.";
+                        }
+
+                        if (message.length()==0) {
+                            insertTerm(submitTermName, submitTermStatus, submitTermStart, submitTermStartReminder, submitTermEnd, submitTermEndReminder);
+                            updateCourseTermIds(termUri, courseIds, courseCheckedValue);
+
+                            addTermDialog.cancel();
+                            setViews();
+                        }
+                        else{
+                            Toast.makeText(TermsOverviewActivity.this, message, Toast.LENGTH_SHORT).show();
+                        }
+
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                 }
                 //Error if none checked
                 else{
@@ -206,8 +257,17 @@ public class TermsOverviewActivity extends AppCompatActivity{
             }
         });
 
-        Button termCancelBtn = (Button) addTermDialog.findViewById(R.id.term_edit_cancel_button);
+        Button termDeleteBtn = (Button) addTermDialog.findViewById(R.id.term_edit_delete_button);
+        termDeleteBtn.setEnabled(false);
 
+        Button termCancelBtn = (Button) addTermDialog.findViewById(R.id.term_edit_cancel_button);
+        termCancelBtn.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                addTermDialog.cancel();
+            }
+        });
 
         addTermDialog.show();
     }
@@ -265,5 +325,24 @@ public class TermsOverviewActivity extends AppCompatActivity{
         adapter = new TermCursorAdapter(TermsOverviewActivity.this, termCursor, 0);
 
         termOverviewLv.setAdapter(adapter);
+    }
+
+    public static void setDynamicHeight(ListView listView) {
+        ListAdapter adapter = listView.getAdapter();
+        //check adapter if null
+        if (adapter == null) {
+            return;
+        }
+        int height = 0;
+        int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(), View.MeasureSpec.UNSPECIFIED);
+        for (int i = 0; i < adapter.getCount(); i++) {
+            View listItem = adapter.getView(i, null, listView);
+            listItem.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
+            height += listItem.getMeasuredHeight();
+        }
+        ViewGroup.LayoutParams layoutParams = listView.getLayoutParams();
+        layoutParams.height = height + (listView.getDividerHeight() * (adapter.getCount() - 1));
+        listView.setLayoutParams(layoutParams);
+        listView.requestLayout();
     }
 }

@@ -16,8 +16,15 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@id/add_note"
+        android:id="@id/add_mentor"
         android:orderInCategory="103"
+        android:title="Add Mentor"
+        app:showAsAction="never"
+        />
+
+    <item
+        android:id="@id/add_note"
+        android:orderInCategory="104"
         android:title="Add Note"
         app:showAsAction="never" />
 </menu>

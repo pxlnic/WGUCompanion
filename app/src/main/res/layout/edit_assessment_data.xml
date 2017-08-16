@@ -1,38 +1,132 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:padding="16dp">
 
-    <TextView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:text="New Assessment"
-        android:layout_marginBottom="8dp"
-        android:textSize="22sp"
-        android:id="@+id/assessment_edit_header"/>
+        android:layout_height="match_parent">
 
-    <Spinner
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/assessment_edit_type_spinner"
-        android:layout_below="@+id/assessment_edit_header"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    <Spinner
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/assessment_edit_status_spinner"
-        android:layout_below="@+id/assessment_edit_type_spinner"/>
+            <TextView
+                android:id="@+id/assessment_edit_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginBottom="8dp"
+                android:text="New Assessment"
+                android:textSize="22sp" />
+
+            <TextView
+                android:id="@+id/assessment_edit_course_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/assessment_edit_header"
+                android:text="Select Course"
+                android:textSize="16sp" />
+
+            <Spinner
+                android:id="@+id/assessment_edit_course_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/assessment_edit_course_header"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/assessment_edit_type_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/assessment_edit_course_spinner"
+                android:text="Select Type"
+                android:textSize="16sp" />
+
+            <Spinner
+                android:id="@+id/assessment_edit_type_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/assessment_edit_type_header"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/assessment_edit_status_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/assessment_edit_type_spinner"
+                android:text="Select Status"
+                android:textSize="16sp" />
+
+            <Spinner
+                android:id="@+id/assessment_edit_status_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/assessment_edit_status_header"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/assessment_edit_date_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/assessment_edit_status_spinner"
+                android:text="Set Goal Date"
+                android:textSize="16sp" />
+
+            <CheckBox
+                android:id="@+id/assessment_edit_reminder_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/assessment_edit_status_spinner"
+                android:paddingBottom="8dp"
+                android:text="Reminder" />
+
+            <DatePicker
+                android:id="@+id/assessment_edit_date_picker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/assessment_edit_reminder_checkbox"
+                android:layout_marginBottom="8dp">
 
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/assessment_edit_status_spinner"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:hint="Due Date (yyyy/mm/dd)"/>
+            </DatePicker>
 
+            <RelativeLayout
+                android:id="@+id/assessment_edit_button_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true">
+
+                <Button
+                    android:id="@+id/assessment_edit_submit_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:text="Submit" />
+
+                <Button
+                    android:id="@+id/assessment_edit_delete_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toLeftOf="@+id/assessment_edit_submit_button"
+                    android:layout_toStartOf="@+id/assessment_edit_submit_button"
+                    android:text="Delete" />
+
+                <Button
+                    android:id="@+id/assessment_edit_cancel_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toLeftOf="@+id/assessment_edit_delete_button"
+                    android:layout_toStartOf="@+id/assessment_edit_delete_button"
+                    android:text="Cancel" />
+
+            </RelativeLayout>
+        </RelativeLayout>
+    </ScrollView>
 </RelativeLayout>

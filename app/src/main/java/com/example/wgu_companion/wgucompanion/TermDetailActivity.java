@@ -13,18 +13,24 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class TermDetailActivity extends AppCompatActivity{
@@ -33,7 +39,7 @@ public class TermDetailActivity extends AppCompatActivity{
     //Activity Variables
     private String action = "";
     private CourseViewCursorAdapter adapter;
-    private TermCourseCursorAdapter dialogAdapter;
+    private TermCourseSelectCursorAdapter dialogAdapter;
     private Uri tempUri = null;
     private CompanionContentProvider provider = new CompanionContentProvider();
     private ContentViewLoader contentLoader = new ContentViewLoader();
@@ -41,7 +47,9 @@ public class TermDetailActivity extends AppCompatActivity{
 
     //Term Name/Progress/Dates Variables
     private String termNameText = "";
+    private String termStartDate = "";
     private String termStartText = "";
+    private String termEndDate = "";
     private String termEndText = "";
     private String termStatusText = "";
     private int termCompletedCU = 0;
@@ -108,7 +116,11 @@ public class TermDetailActivity extends AppCompatActivity{
 
         switch(id){
             case R.id.edit_term:
-                editTerm();
+                try {
+                    editTerm();
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
                 break;
             case R.id.delete_term:
                 deleteTerm();
@@ -124,72 +136,84 @@ public class TermDetailActivity extends AppCompatActivity{
             getContentResolver().delete(CompanionContentProvider.TERM_URI, filter, null);
     }
 
-    private void editTerm() {
-        //New Term Variables to pass
-        String dialogTermNameText = termNameText;
-        String dialogTermStatusText = termStatusText;
-        String dialogTermStartText;
-        final Boolean termStartReminder = false;
-        String dialogTermEndText;
-        Boolean termEndReminder = false;
+    private void editTerm() throws ParseException {
         List<String> statusArray = new ArrayList<>();
-        statusArray.add("Note Attempted");
-        statusArray.add("In Progress");
-        statusArray.add("Complete");
 
-        final Dialog addTermDialog = new Dialog(TermDetailActivity.this);
-        addTermDialog.setContentView(R.layout.edit_term_data);
+        final Dialog editTermDialog = new Dialog(TermDetailActivity.this);
+        editTermDialog.setContentView(R.layout.edit_term_data);
 
         //Set Custom Dialog Components
         //Term Name
-        final EditText termNameEt = (EditText) addTermDialog.findViewById(R.id.term_edit_name_field);
-        termNameEt.setText(dialogTermNameText);
+        final EditText termNameEt = (EditText) editTermDialog.findViewById(R.id.term_edit_name_field);
+        termNameEt.setText(termNameText);
 
         //Term Status
-        final Spinner termStatusSpin = (Spinner) addTermDialog.findViewById(R.id.term_edit_status_spinner);
-        ArrayAdapter<String> termStatusAdapter = new ArrayAdapter<>(addTermDialog.getContext(),
+        Cursor statusCursor = getContentResolver().query(CompanionContentProvider.STATUS_URI, DBHelper.STATUS_COLUMNS, null, null, null);
+        statusCursor.moveToFirst();
+
+        for(int i=0; i<statusCursor.getCount(); i++){
+            String name = statusCursor.getString(statusCursor.getColumnIndex(DBHelper.STATUS_NAME));
+            statusArray.add(name);
+            statusCursor.moveToNext();
+        }
+
+        final Spinner termStatusSpin = (Spinner) editTermDialog.findViewById(R.id.term_edit_status_spinner);
+        ArrayAdapter<String> termStatusAdapter = new ArrayAdapter<>(editTermDialog.getContext(),
                 android.R.layout.simple_spinner_item,
-                getResources().getStringArray(R.array.term_status_array));
+                statusArray);
         termStatusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         termStatusSpin.setAdapter(termStatusAdapter);
 
-        if (!dialogTermStatusText.equals(null)) {
-            int spinnerPosition = statusArray.indexOf(dialogTermStatusText);
+        if (!termStatusText.equals(null)) {
+            int spinnerPosition = statusArray.indexOf(termStatusText);
             Log.d("Load Data", "Spinner Position: " + spinnerPosition);
             termStatusSpin.setSelection(spinnerPosition);
         }
 
         //Term Start
-        dialogTermStartText = contentLoader.loadTermStart(TermDetailActivity.this, tempUri);
-        final EditText termStartEt = (EditText) addTermDialog.findViewById(R.id.term_edit_start_field);
-        termStartEt.setText(dialogTermStartText);
+        final DatePicker termStartPick = (DatePicker) editTermDialog.findViewById(R.id.term_edit_start_picker);
+        SimpleDateFormat yearFormat  = new SimpleDateFormat("yyyy");
+        SimpleDateFormat monthFormat  = new SimpleDateFormat("MM");
+        SimpleDateFormat dayFormat  = new SimpleDateFormat("dd");
+        Date initStartDate = new SimpleDateFormat("yyyy/MM/dd").parse(termStartDate);
+        int initStartYear = Integer.parseInt(yearFormat.format(initStartDate));
+        int initStartMonth = Integer.parseInt(monthFormat.format(initStartDate))-1;
+        int initStartDay = Integer.parseInt(dayFormat.format(initStartDate));
+
+        termStartPick.init(initStartYear, initStartMonth, initStartDay, null);
 
         boolean startChecked = contentLoader.loadTermStartReminder(TermDetailActivity.this, tempUri);
-        final CheckBox termStartChk = (CheckBox) addTermDialog.findViewById(R.id.term_edit_start_checkbox);
+        final CheckBox termStartChk = (CheckBox) editTermDialog.findViewById(R.id.term_edit_start_checkbox);
         termStartChk.setChecked(startChecked);
 
         //Term End
-        dialogTermEndText = contentLoader.loadTermEnd(TermDetailActivity.this, tempUri);
-        final EditText termEndEt = (EditText) addTermDialog.findViewById(R.id.term_edit_end_field);
-        termEndEt.setText(dialogTermEndText);
+        final DatePicker termEndPick = (DatePicker) editTermDialog.findViewById(R.id.term_edit_end_picker);
+        Date initEndDate = new SimpleDateFormat("yyyy/MM/dd").parse(termEndDate);
+        int initEndYear = Integer.parseInt(yearFormat.format(initEndDate));
+        int initEndMonth = Integer.parseInt(monthFormat.format(initEndDate))-1;
+        int initEndDay = Integer.parseInt(dayFormat.format(initEndDate));
+
+        termEndPick.init(initEndYear, initEndMonth, initEndDay, null);
 
         boolean endChecked = contentLoader.loadTermEndReminder(TermDetailActivity.this, tempUri);
-        final CheckBox termEndChk = (CheckBox) addTermDialog.findViewById(R.id.term_edit_end_checkbox);
+        final CheckBox termEndChk = (CheckBox) editTermDialog.findViewById(R.id.term_edit_end_checkbox);
         termEndChk.setChecked(endChecked);
 
         //Term Course List
-        final ListView dialogTermCourseLv = (ListView) addTermDialog.findViewById(R.id.term_edit_course_list);
+        final ListView dialogTermCourseLv = (ListView) editTermDialog.findViewById(R.id.term_edit_course_list);
 
         final Cursor dialogTermCourseCursor = getContentResolver().query(CompanionContentProvider.COURSE_URI, DBHelper.COURSE_COLUMNS,
                 null, null, null);
         dialogTermCourseCursor.moveToFirst();
 
-        dialogAdapter = new TermCourseCursorAdapter(TermDetailActivity.this, dialogTermCourseCursor);
+        dialogAdapter = new TermCourseSelectCursorAdapter(TermDetailActivity.this, dialogTermCourseCursor);
         dialogTermCourseLv.setAdapter(dialogAdapter);
+
+        setDynamicHeight(dialogTermCourseLv);
 
         //Buttons
         //Submit Button Handler
-        Button termSubmitBtn = (Button) addTermDialog.findViewById(R.id.term_edit_submit_button);
+        Button termSubmitBtn = (Button) editTermDialog.findViewById(R.id.term_edit_submit_button);
         termSubmitBtn.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -210,19 +234,32 @@ public class TermDetailActivity extends AppCompatActivity{
                     int termIdToPass = Integer.parseInt(tempUri.getLastPathSegment());
                     String submitTermName = termNameEt.getText().toString().trim();
                     String submitTermStatus = termStatusSpin.getSelectedItem().toString().trim();
-                    String submitTermStart = termStartEt.getText().toString().trim();
+
+                    int pickStartDay = termStartPick.getDayOfMonth();
+                    int pickStartMonth = termStartPick.getMonth() + 1;
+                    int pickStartYear = termStartPick.getYear();
+
+                    String submitTermStart = contentLoader.convertDate(pickStartDay, pickStartMonth, pickStartYear);
+
                     int submitTermStartReminder = 0;
                     if (termStartChk.isChecked()) {
                         submitTermStartReminder = 1;
                     }
-                    String submitTermEnd = termEndEt.getText().toString().trim();
+
+                    int pickEndDay = termEndPick.getDayOfMonth();
+                    int pickEndMonth = termEndPick.getMonth() + 1;
+                    int pickEndYear = termEndPick.getYear();
+
+                    String submitTermEnd = contentLoader.convertDate(pickEndDay, pickEndMonth, pickEndYear);
+
                     int submitTermEndReminder = 0;
                     if (termEndChk.isChecked()) {
                         submitTermEndReminder = 1;
                     }
 
-                    //Get Course ID's
+                    //Get Course ID's and Course/Term IDs
                     List<String> courseIds = contentLoader.loadCourseIds(dialogTermCourseCursor);
+                    List<String> courseTermIds = contentLoader.loadCourseTermIds(dialogTermCourseCursor);
 
                     //Determine if course is checked or unchecked
                     List<String> courseCheckedValue = new ArrayList<>();
@@ -238,11 +275,42 @@ public class TermDetailActivity extends AppCompatActivity{
 
                     Log.d("Load Data", "Course ID Count: " + courseIds.size());
 
-                    updateTerm(termIdToPass, submitTermName, submitTermStatus, submitTermStart, submitTermStartReminder, submitTermEnd, submitTermEndReminder);
-                    updateCourseTermIds(termIdToPass, courseIds, courseCheckedValue);
+                    try {
+                        //Get current date and reminder date
+                        Date now = new Date();
+                        Date verifyStart = new SimpleDateFormat("yyyy/MM/dd").parse(submitTermStart);
+                        Date verifyEnd = new SimpleDateFormat("yyyy/MM/dd").parse(submitTermEnd);
+                        String message = "";
 
-                    addTermDialog.cancel();
-                    setViews(tempUri);
+                        //If reminder checked verify that reminder date is after today
+                        if (submitTermStartReminder == 1) {
+                            if (verifyStart.before(now)) {
+                                message = message + "Start Date must be after today to have a reminder set.";
+                            }
+                        }
+                        if(submitTermEndReminder == 1) {
+                            if(verifyEnd.before(now)){
+                                message = message + "End Date must be after today to have a reminder set";
+                            }
+                        }
+                        if(verifyStart.after(verifyEnd)){
+                            message = message + "Start date cannot be after End date.";
+                        }
+
+                        if (message.length()==0) {
+                            updateTerm(termIdToPass, submitTermName, submitTermStatus, submitTermStart, submitTermStartReminder, submitTermEnd,
+                                    submitTermEndReminder);
+                            updateCourseTermIds(termIdToPass, courseIds, courseTermIds, courseCheckedValue);
+
+                            editTermDialog.cancel();
+                            setViews(tempUri);
+                        }
+                        else{
+                            Toast.makeText(TermDetailActivity.this, message, Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                 }
                 //Error if none checked
                 else{
@@ -253,7 +321,7 @@ public class TermDetailActivity extends AppCompatActivity{
         });
 
         //Delete Button Handler
-        Button termDeleteBtn = (Button) addTermDialog.findViewById(R.id.term_edit_delete_button);
+        Button termDeleteBtn = (Button) editTermDialog.findViewById(R.id.term_edit_delete_button);
         termDeleteBtn.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -271,27 +339,27 @@ public class TermDetailActivity extends AppCompatActivity{
 
                 if(count == 0) {
                     deleteTerm();
-                    addTermDialog.cancel();
+                    editTermDialog.cancel();
                     Intent intent = new Intent(TermDetailActivity.this, TermsOverviewActivity.class);
                     startActivity(intent);
                 }
                 else{
-                    Toast.makeText(TermDetailActivity.this, "Cannot delete while courses selected.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TermDetailActivity.this, "Cannot delete term while courses selected.", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
         //Cancel Button Handler
-        Button termCancelBtn = (Button) addTermDialog.findViewById(R.id.term_edit_cancel_button);
+        Button termCancelBtn = (Button) editTermDialog.findViewById(R.id.term_edit_cancel_button);
         termCancelBtn.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
-                addTermDialog.cancel();
+                editTermDialog.cancel();
             }
         });
 
-        addTermDialog.show();
+        editTermDialog.show();
     }
 
     //Update Term
@@ -309,14 +377,15 @@ public class TermDetailActivity extends AppCompatActivity{
     }
 
     //Update Courses Term ID
-    private void updateCourseTermIds(int id, List<String> courseIds, List<String> courseChecked){
+    private void updateCourseTermIds(int id, List<String> courseIds, List<String> courseTermIds, List<String> courseChecked){
         for(int i=0; i<courseIds.size(); i++) {
             ContentValues courseValues = new ContentValues();
             if(courseChecked.get(i).equals("1")) {
                 courseValues.put(DBHelper.COURSE_TERM_ID, id);
             }
-            else if(Integer.parseInt(courseIds.get(i))==id){
+            else if(Integer.parseInt(courseTermIds.get(i))==id){
                 courseValues.put(DBHelper.COURSE_TERM_ID, -99);
+                courseValues.put(DBHelper.COURSE_STATUS, "In Progress");
             }
             String filter = DBHelper.COURSE_ID + "=" + courseIds.get(i);
             getContentResolver().update(CompanionContentProvider.COURSE_URI, courseValues, filter, null);
@@ -333,7 +402,8 @@ public class TermDetailActivity extends AppCompatActivity{
         termTv.requestFocus();
 
         //Set Term  Start Date
-        termStartText = "Start Date: " + contentLoader.loadTermStart(TermDetailActivity.this, uri);
+        termStartDate = contentLoader.loadTermStart(TermDetailActivity.this, uri);
+        termStartText = "Start Date: " + termStartDate;
         termStartTv = (TextView) findViewById(R.id.term_detail_start_text);
         termStartTv.setText(termStartText);
         termStartTv.requestFocus();
@@ -345,7 +415,13 @@ public class TermDetailActivity extends AppCompatActivity{
         termStatusTv.requestFocus();
 
         //Set Term End Date
-        termEndText = "Expected End Date: " + contentLoader.loadTermEnd(TermDetailActivity.this, uri);
+        termEndDate = contentLoader.loadTermEnd(TermDetailActivity.this, uri);
+        if(termStatusText.equals("Complete")){
+            termEndText = "End Date: " + termEndDate;
+        }
+        else {
+            termEndText = "Expected End Date: " + termEndDate;
+        }
         termEndTv = (TextView) findViewById(R.id.term_detail_end_text);
         termEndTv.setText(termEndText);
         termEndTv.requestFocus();
@@ -375,5 +451,24 @@ public class TermDetailActivity extends AppCompatActivity{
         adapter = new CourseViewCursorAdapter(TermDetailActivity.this, termCourseCursor,0);
 
         termCourseLv.setAdapter(adapter);
+    }
+
+    public static void setDynamicHeight(ListView listView) {
+        ListAdapter adapter = listView.getAdapter();
+        //check adapter if null
+        if (adapter == null) {
+            return;
+        }
+        int height = 0;
+        int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(), View.MeasureSpec.UNSPECIFIED);
+        for (int i = 0; i < adapter.getCount(); i++) {
+            View listItem = adapter.getView(i, null, listView);
+            listItem.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
+            height += listItem.getMeasuredHeight();
+        }
+        ViewGroup.LayoutParams layoutParams = listView.getLayoutParams();
+        layoutParams.height = height + (listView.getDividerHeight() * (adapter.getCount() - 1));
+        listView.setLayoutParams(layoutParams);
+        listView.requestLayout();
     }
 }

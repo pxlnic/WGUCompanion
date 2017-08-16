@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/edit_mentor_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="Edit Mentor"
+        android:textSize="20sp" />
+
+    <EditText
+        android:id="@+id/edit_mentor_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:hint="Mentor Name" />
+
+    <EditText
+        android:id="@+id/edit_mentor_phone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:hint="Mentor Phone"
+        android:inputType="phone" />
+
+    <EditText
+        android:id="@+id/edit_mentor_email"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:hint="Mentor Email"
+        android:inputType="textEmailAddress" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/edit_mentor_submit_button"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:text="Submit"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/edit_mentor_delete_button"
+            android:layout_toLeftOf="@+id/edit_mentor_submit_button"
+            android:layout_toStartOf="@+id/edit_mentor_submit_button"
+            android:text="Delete"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/edit_mentor_cancel_button"
+            android:layout_toLeftOf="@+id/edit_mentor_delete_button"
+            android:layout_toStartOf="@+id/edit_mentor_delete_button"
+            android:text="Cancel"/>
+
+    </RelativeLayout>
+
+</LinearLayout>

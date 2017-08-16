@@ -12,6 +12,7 @@
     <item name="course_detail_name_header" type="id">Course Detail Name Header</item>
     <item name="course_mentor_list" type="id">Course Mentor List</item>
     <item name="delete_note" type="id">Delete Note</item>
+    <item name="add_mentor" type="id">Add Mentor</item>
     <item name="add_photo" type="id">Add Photo</item>
     <item name="share_note" type="id">Share Note</item>
     <item name="edit_course" type="id">Edit Course</item>

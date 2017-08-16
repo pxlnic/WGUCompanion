@@ -1,30 +1,43 @@
 package com.example.wgu_companion.wgucompanion;
 
-import android.app.LoaderManager;
-import android.content.CursorLoader;
+import android.app.Dialog;
+import android.content.ContentValues;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.v4.widget.CursorAdapter;
-import android.support.v4.widget.SimpleCursorAdapter;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class AssessmentsDetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+public class AssessmentsDetailActivity extends AppCompatActivity{
     //Activity Variables
     private String action = "";
-    CursorAdapter adapter;
-    public static final String ASSESSMENT_PREFS = "Assessment_Prefs";
+    CourseNotesAdapter adapter;
+    private int courseId;
+    private String assessmentGoalDate = "";
+    ContentViewLoader loader = new ContentViewLoader();
+
     Uri uriToPass;
     private static final int ADD_NOTE_REQUEST_CODE = 3002;
     private static final int VIEW_NOTE_REQUEST_CODE = 3003;
@@ -51,23 +64,23 @@ public class AssessmentsDetailActivity extends AppCompatActivity implements Load
 
         Uri uri = intent.getParcelableExtra(CompanionContentProvider.ASSESSMENT_ITEM_TYPE);
 
-        if(uri == null){
-            SharedPreferences passedUri = getSharedPreferences(ASSESSMENT_PREFS, 0);
-            uri = Uri.parse(passedUri.getString("assessmentUri", "No URI Found."));
-            Log.d("Load Data", "Passed URI Loaded: " + uri);
-            uriToPass = uri;
-            setViews(uri);
+        setTitle("Assessment Details");
+
+        Log.d("Load Data", "Uri" + uri);
+
+        if(uri==null){
+            SharedPreferences pref = getSharedPreferences(AssessmentOverviewActivity.ASSESSMENT_PREFS, 0);
+            Long id = pref.getLong("assessmentUri", 0);
+            uri = Uri.parse(CompanionContentProvider.ASSESSMENT_URI + "/" + id);
         }
-        else {
-            uriToPass = uri;
-            setViews(uri);
-        }
+
+        uriToPass = uri;
+        setViews(uri);
     }
 
     @Override
     protected void onResume(){
         super.onResume();
-
     }
 
     @Override
@@ -86,7 +99,11 @@ public class AssessmentsDetailActivity extends AppCompatActivity implements Load
 
         switch(id){
             case R.id.edit_assessment:
-                editAssessment();
+                try {
+                    editAssessment();
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
                 break;
             case R.id.delete_assessment:
                 deleteAssessment();
@@ -99,21 +116,214 @@ public class AssessmentsDetailActivity extends AppCompatActivity implements Load
     }
 
     private void addNote() {
+        SharedPreferences passedUri = getSharedPreferences(AssessmentOverviewActivity.ASSESSMENT_PREFS, 0);
+        SharedPreferences.Editor editor = passedUri.edit();
+        editor.putInt("courseId", courseId);
+        Log.d("Load Data", "Passing Course ID: " + courseId);
+        editor.commit();
+
         Intent menuIntent;
         menuIntent = new Intent(AssessmentsDetailActivity.this, CourseNotesActivity.class);
         startActivityForResult(menuIntent, ADD_NOTE_REQUEST_CODE);
     }
 
     private void deleteAssessment() {
-
+        int assessmentId = Integer.parseInt(uriToPass.getLastPathSegment());
+        String filter = DBHelper.ASSESSMENT_ID + "=" + assessmentId;
+        getContentResolver().delete(CompanionContentProvider.ASSESSMENT_URI, filter, null);
     }
 
-    private void editAssessment() {
+    private void editAssessment() throws ParseException {
+        List<String> courseArray = new ArrayList<>();
+        List<String> statusArray = new ArrayList<>();
+        List<String> typeArray = new ArrayList<>();
 
+        final Dialog editAssessmentDialog = new Dialog(AssessmentsDetailActivity.this);
+        editAssessmentDialog.setContentView(R.layout.edit_assessment_data);
+
+        //Set Header
+        TextView header = (TextView) editAssessmentDialog.findViewById(R.id.assessment_edit_header);
+        header.setText("Edit Assessment");
+
+    //Set Course Spinner
+        Cursor courseCursor = getContentResolver().query(CompanionContentProvider.COURSE_URI, DBHelper.COURSE_COLUMNS, null, null, null);
+        courseCursor.moveToFirst();
+
+        //Add courses to spinner
+        for(int i=0; i<courseCursor.getCount(); i++){
+            String name = courseCursor.getString(courseCursor.getColumnIndex(DBHelper.COURSE_NAME));
+            courseArray.add(name);
+            courseCursor.moveToNext();
+        }
+
+        //Bind spinner
+        final Spinner assessmentCourseSpin = (Spinner) editAssessmentDialog.findViewById(R.id.assessment_edit_course_spinner);
+        ArrayAdapter<String> assessmentCourseAdapter = new ArrayAdapter<>(editAssessmentDialog.getContext(),
+                android.R.layout.simple_spinner_item,
+                courseArray);
+        assessmentCourseAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        assessmentCourseSpin.setAdapter(assessmentCourseAdapter);
+
+        //Set default value
+        int courseSpinnerPosition = courseArray.indexOf(assessmentCourseNameText);
+        assessmentCourseSpin.setSelection(courseSpinnerPosition);
+
+    //Set Type Spinner
+        Cursor typeCursor = getContentResolver().query(CompanionContentProvider.ASSESSMENT_TYPE_URI, DBHelper.ASSESSMENT_TYPE_COLUMNS,
+                null, null, null);
+        typeCursor.moveToFirst();
+
+        //Add types to spinner
+        for(int i=0; i<typeCursor.getCount(); i++){
+            String type = typeCursor.getString(typeCursor.getColumnIndex(DBHelper.ASSESSMENT_TYPE_NAME));
+            typeArray.add(type);
+            typeCursor.moveToNext();
+            Log.d("Load Data", "Type Added: " + type);
+        }
+
+        final Spinner editAssessmentTypeSpin = (Spinner) editAssessmentDialog.findViewById(R.id.assessment_edit_type_spinner);
+        ArrayAdapter<String> assessmentTypeAdapter = new ArrayAdapter<>(editAssessmentDialog.getContext(),
+                android.R.layout.simple_spinner_item,
+                typeArray);
+        assessmentTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        editAssessmentTypeSpin.setAdapter(assessmentTypeAdapter);
+
+        //Set default value
+        int typeSpinnerPosition = typeArray.indexOf(assessmentTypeText.trim());
+        editAssessmentTypeSpin.setSelection(typeSpinnerPosition);
+        Log.d("Load Data", "Type Array Size: " + typeArray.size());
+        Log.d("Load Data", "Assessment Type: " + assessmentTypeText);
+        Log.d("Load Data", "Assessment Type Location in Spinner: " + typeSpinnerPosition);
+
+    //Set Status Spinner
+        Cursor statusCursor = getContentResolver().query(CompanionContentProvider.STATUS_URI, DBHelper.STATUS_COLUMNS, null, null, null);
+        statusCursor.moveToFirst();
+
+        for(int i=0; i<statusCursor.getCount(); i++){
+            String name = statusCursor.getString(statusCursor.getColumnIndex(DBHelper.STATUS_NAME));
+            if(name.equals("Passed") || name.equals("Failed") || name.equals("Not Attempted")) {
+                statusArray.add(name);
+            }
+            statusCursor.moveToNext();
+        }
+
+        final Spinner editAssessmentStatusSpin = (Spinner)  editAssessmentDialog.findViewById(R.id.assessment_edit_status_spinner);
+        ArrayAdapter<String> assessmentStatusAdapter = new ArrayAdapter<>(editAssessmentDialog.getContext(),
+                android.R.layout.simple_spinner_item,
+                statusArray);
+        assessmentStatusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        editAssessmentStatusSpin.setAdapter(assessmentStatusAdapter);
+
+        //Set default value
+        int statusSpinnerPosition = statusArray.indexOf(assessmentStatusText);
+        editAssessmentStatusSpin.setSelection(statusSpinnerPosition);
+
+        Log.d("Load Data", "Status Array Size: " + statusArray.size());
+        Log.d("Load Data", "Assessment Status: " + assessmentStatusText);
+        Log.d("Load Data", "Assessment Status Location in Spinner: " + statusSpinnerPosition);
+
+        //Set Goal Date
+        final DatePicker assessmentGoalDatePk = (DatePicker) editAssessmentDialog.findViewById(R.id.assessment_edit_date_picker);
+        SimpleDateFormat yearFormat  = new SimpleDateFormat("yyyy");
+        SimpleDateFormat monthFormat  = new SimpleDateFormat("MM");
+        SimpleDateFormat dayFormat  = new SimpleDateFormat("dd");
+        Date initGoalDate = new SimpleDateFormat("yyyy/MM/dd").parse(assessmentGoalDate);
+        int initEndYear = Integer.parseInt(yearFormat.format(initGoalDate));
+        int initEndMonth = Integer.parseInt(monthFormat.format(initGoalDate))-1;
+        int initEndDay = Integer.parseInt(dayFormat.format(initGoalDate));
+
+        assessmentGoalDatePk.init(initEndYear, initEndMonth, initEndDay, null);
+
+        final CheckBox assessmentGoalReminderChk = (CheckBox) editAssessmentDialog.findViewById(R.id.assessment_edit_reminder_checkbox);
+        boolean endCheck = loader.loadAssessmentGoalReminder(AssessmentsDetailActivity.this, uriToPass);
+        assessmentGoalReminderChk.setChecked(endCheck);
+
+
+        //Button Handlers
+        //Submit Button
+        Button editAssessmentSubmitBtn = (Button) editAssessmentDialog.findViewById(R.id.assessment_edit_submit_button);
+        editAssessmentSubmitBtn.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                int updateAssessmentId = Integer.parseInt(uriToPass.getLastPathSegment());
+                String updateAssessmentType = editAssessmentTypeSpin.getSelectedItem().toString().trim();
+                String updateAssessmentStatus = editAssessmentStatusSpin.getSelectedItem().toString().trim();
+
+                int pickDay  = assessmentGoalDatePk.getDayOfMonth();
+                int pickMonth = assessmentGoalDatePk.getMonth() + 1;
+                int pickYear = assessmentGoalDatePk.getYear();
+
+                String updateAssessmentDate = loader.convertDate(pickDay, pickMonth, pickYear);
+                int updateAssessmentReminder = 0;
+                if(assessmentGoalReminderChk.isChecked()){
+                    updateAssessmentReminder = 1;
+                }
+
+                try {
+                    //Get current date and reminder date
+                    boolean isOk = false;
+                    Date now = new Date();
+                    Date verifyGoal = new SimpleDateFormat("yyyy/MM/dd").parse(updateAssessmentDate);
+
+                    //If reminder checked verify that reminder date is after today
+                    if(updateAssessmentReminder==1) {
+                        if (verifyGoal.before(now)) {
+                            Toast.makeText(AssessmentsDetailActivity.this, "Date must be after today to have a reminder set.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                        else{
+                            isOk = true;
+                        }
+                    }
+                    if(isOk){
+                        updateAssessment(updateAssessmentId, courseId, updateAssessmentType, updateAssessmentStatus, updateAssessmentDate, updateAssessmentReminder);
+
+                        editAssessmentDialog.cancel();
+                        setViews(uriToPass);
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        //Delete Button
+        Button editAssessmentDeleteBtn = (Button) editAssessmentDialog.findViewById(R.id.assessment_edit_delete_button);
+        editAssessmentDeleteBtn.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                deleteAssessment();
+
+                editAssessmentDialog.cancel();
+                Intent intent = new Intent(AssessmentsDetailActivity.this, AssessmentOverviewActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        //Cancel Button
+        Button editAssessmentCancelBtn = (Button) editAssessmentDialog.findViewById(R.id.assessment_edit_cancel_button);
+        editAssessmentCancelBtn.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                editAssessmentDialog.cancel();
+            }
+        });
+
+        editAssessmentDialog.show();
     }
 
-    private void reloadData(){
-        getLoaderManager().restartLoader(0, null, this);
+    private void updateAssessment(int id, int cid, String type, String status, String date, int reminder) {
+        ContentValues values = new ContentValues();
+        values.put(DBHelper.ASSESSMENT_COURSE_ID, cid);
+        values.put(DBHelper.ASSESSMENT_TYPE, type);
+        values.put(DBHelper.ASSESSMENT_STATUS, status);
+        values.put(DBHelper.ASSESSMENT_DUE_DATE, date);
+        values.put(DBHelper.ASSESSMENT_DUE_DATE_REMINDER, reminder);
+        String filter = DBHelper.ASSESSMENT_ID + "=" + id;
+        getContentResolver().update(CompanionContentProvider.ASSESSMENT_URI, values, filter, null);
     }
 
     public void setViews(Uri uri) {
@@ -132,7 +342,8 @@ public class AssessmentsDetailActivity extends AppCompatActivity implements Load
         assessmentTypeTv.requestFocus();
 
         //Set Assessment Due Date
-        assessmentExpectedDueDateText = "Expected End Date: " + contentLoader.loadAssessmentDueDate(AssessmentsDetailActivity.this, uri);
+        assessmentGoalDate = contentLoader.loadAssessmentDueDate(AssessmentsDetailActivity.this, uri);
+        assessmentExpectedDueDateText = "Goal Date: " + assessmentGoalDate;
         assessmentEndTv = (TextView) findViewById(R.id.assessment_due_date_text);
         assessmentEndTv.setText(assessmentExpectedDueDateText);
         assessmentEndTv.requestFocus();
@@ -146,52 +357,34 @@ public class AssessmentsDetailActivity extends AppCompatActivity implements Load
         //Set Assessment Notes ListView
         assessmentNotesLv = (ListView) findViewById(R.id.assessment_detail_note_list);
 
-        String[] from = {DBHelper.NOTE_TITLE};
-        int[] to = {android.R.id.text1};
-        adapter = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_1, null, from, to, 0);
+        String courseFilter = DBHelper.COURSE_NAME + "= '" + assessmentCourseNameText + "'";
+        Cursor courseIdCursor =  getContentResolver().query(CompanionContentProvider.COURSE_URI, DBHelper.COURSE_COLUMNS, courseFilter,
+                null, null);
+        courseIdCursor.moveToFirst();
+        courseId = courseIdCursor.getInt(courseIdCursor.getColumnIndex(DBHelper.COURSE_ID));
+
+        String filter = DBHelper.NOTE_COURSE_ID + "=" + courseId;
+        Cursor notesCursor = getContentResolver().query(CompanionContentProvider.NOTE_URI, DBHelper.NOTE_COLUMNS, filter, null, null);
+        adapter = new CourseNotesAdapter(AssessmentsDetailActivity.this, notesCursor, 0);
 
         assessmentNotesLv.setAdapter(adapter);
-
-        getLoaderManager().initLoader(0, null, this);
 
         assessmentNotesLv.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-                SharedPreferences passedUri = getSharedPreferences(ASSESSMENT_PREFS, 0);
-                SharedPreferences.Editor editor = passedUri.edit();
-                editor.putString("assessmentUri", uriToPass.toString());
-                editor.commit();
-
                 Intent intent = new Intent(AssessmentsDetailActivity.this, CourseNotesActivity.class);
                 Uri uri = Uri.parse(CompanionContentProvider.NOTE_URI + "/" + id);
                 intent.putExtra(CompanionContentProvider.NOTE_ITEM_TYPE, uri);
-                Log.d("Load Data", "Prior URI: " );
+
+                SharedPreferences passedUri = getSharedPreferences(AssessmentOverviewActivity.ASSESSMENT_PREFS, 0);
+                SharedPreferences.Editor editor = passedUri.edit();
+                editor.putInt("courseId", courseId);
+                Log.d("Load Data", "Passing Course ID: " + courseId);
+                editor.commit();
+
+                Log.d("Load Data", "Prior URI: " + uri);
                 startActivityForResult(intent, VIEW_NOTE_REQUEST_CODE);
             }
         });
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this, CompanionContentProvider.NOTE_URI,
-                null, null, null, null);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        adapter.swapCursor(data);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        adapter.swapCursor(null);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
-        if((requestCode == VIEW_NOTE_REQUEST_CODE && resultCode == RESULT_OK) ||
-                (requestCode == ADD_NOTE_REQUEST_CODE && resultCode == RESULT_OK)){
-            reloadData();
-        }
     }
 }

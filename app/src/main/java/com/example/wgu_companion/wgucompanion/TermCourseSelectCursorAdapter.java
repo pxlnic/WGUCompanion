@@ -12,9 +12,9 @@ import android.widget.CheckBox;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
-public class TermCourseCursorAdapter extends CursorAdapter {
+public class TermCourseSelectCursorAdapter extends CursorAdapter {
 
-    public TermCourseCursorAdapter(Context context, Cursor c) {
+    public TermCourseSelectCursorAdapter(Context context, Cursor c) {
         super(context, c, 0);
     }
 

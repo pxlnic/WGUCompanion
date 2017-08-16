@@ -63,6 +63,7 @@ public class DBHelper extends SQLiteOpenHelper {
     //public static final String ASSESSMENT_STATUS_ID = "assessment_status_id";
     public static final String ASSESSMENT_STATUS = "assessment_status";
     public static final String ASSESSMENT_DUE_DATE = "assessment_due_date";
+    public static final String ASSESSMENT_DUE_DATE_REMINDER = "assessment_due_date_reminder";
 
     //Assessment Type Columns
     public static final String ASSESSMENT_TYPE_ID = "_id";
@@ -98,7 +99,7 @@ public class DBHelper extends SQLiteOpenHelper {
             COURSE_START_DATE, COURSE_END_DATE, COURSE_START_REMINDER, COURSE_END_REMINDER,
             COURSE_DESCRIPTION, COURSE_CU_COUNT};
     public static final String[] ASSESSMENT_COLUMNS = {ASSESSMENT_ID, ASSESSMENT_COURSE_ID, ASSESSMENT_TYPE, ASSESSMENT_STATUS,
-            ASSESSMENT_DUE_DATE};
+            ASSESSMENT_DUE_DATE, ASSESSMENT_DUE_DATE_REMINDER};
     public static final String[] ASSESSMENT_TYPE_COLUMNS = {ASSESSMENT_TYPE_ID, ASSESSMENT_TYPE_NAME};
     public static final String[] MENTOR_COLUMNS = {MENTOR_ID, MENTOR_NAME, MENTOR_PHONE, MENTOR_EMAIL};
     public static final String[] COURSE_MENTOR_COLUMNS = {MENTOR_COURSE_ID, MENTOR_COURSE_C_ID, MENTOR_COURSE_M_ID};
@@ -132,7 +133,7 @@ public class DBHelper extends SQLiteOpenHelper {
    private static final String ASSESSMENT_TABLE_CREATE =
             "CREATE TABLE " + TABLE_ASSESSMENT + " (" + ASSESSMENT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     ASSESSMENT_COURSE_ID + " INTEGER, " + ASSESSMENT_TYPE + " TEXT, " + ASSESSMENT_STATUS + " TEXT, " +
-                    ASSESSMENT_DUE_DATE + " TEXT, " +
+                    ASSESSMENT_DUE_DATE + " TEXT, " + ASSESSMENT_DUE_DATE_REMINDER + ", INTEGER, " +
                     " FOREIGN KEY (" + ASSESSMENT_COURSE_ID + ") REFERENCES " + TABLE_COURSE + "(" + COURSE_ID + "));";
                     //" FOREIGN KEY (" + ASSESSMENT_A_TYPE_ID + ") REFERENCES " + TABLE_ASSESSMENT_TYPE + "(" + ASSESSMENT_TYPE_ID + ")," +
                     //" FOREIGN KEY (" + ASSESSMENT_STATUS_ID + ") REFERENCES " + TABLE_STATUS + "(" + STATUS_ID + "));";
@@ -182,7 +183,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO " + TABLE_STATUS + " (" + STATUS_NAME + ") VALUES " +
             "('Not Attempted'), " +
             "('In Progress'), " +
-            "('Completed'), " +
+            "('Complete'), " +
             "('Passed'), " +
             "('Failed');");
         Log.d("Database", "Status Data Inserted");
@@ -202,29 +203,23 @@ public class DBHelper extends SQLiteOpenHelper {
         //Create Initial Term
         db.execSQL("INSERT INTO " + TABLE_TERM + " (" + TERM_NAME + ", " + TERM_PROGRAM_ID + ", " + TERM_STATUS + ", " +
             TERM_START_DATE + ", " + TERM_END_DATE + ", " + TERM_START_REMINDER + ", " + TERM_END_REMINDER + ") VALUES " +
-            "('Transfer', 1, 'Complete', '2017-06-30', '2017-06-30', 0, 0);");
+            "('Transfer', 1, 'Complete', '2017/06/30', '2017/06/30', 0, 0);");
         Log.d("Database", "Initial Term Inserted");
 
         //Create Initial Course
         db.execSQL("INSERT INTO " + TABLE_COURSE + " (" + COURSE_NAME + ", " + COURSE_TERM_ID + ", " + COURSE_PROGRAM_ID + ", " +
             COURSE_STATUS + ", " + COURSE_START_DATE + ", " + COURSE_END_DATE + ", " + COURSE_START_REMINDER + ", " +
             COURSE_END_REMINDER + ", " + COURSE_DESCRIPTION + ", " + COURSE_CU_COUNT + ") VALUES" +
-            "('C182 - Introduction to IT', 1, 1, 'Complete', '2017-06-30', '2017-06-30', 0, 0, " +
+            "('C182 - Introduction to IT', 1, 1, 'Complete', '2017/06/30', '2017/06/30', 0, 0, " +
             "'This course introduces students to information technology as a discipline and the various roles and functions of the IT department as business support.', " +
             "3);");
 
-        db.execSQL("INSERT INTO " + TABLE_COURSE + " (" + COURSE_NAME + ", " + COURSE_TERM_ID + ", " + COURSE_PROGRAM_ID + ", " +
-                COURSE_STATUS + ", " + COURSE_START_DATE + ", " + COURSE_END_DATE + ", " + COURSE_START_REMINDER + ", " +
-                COURSE_END_REMINDER + ", " + COURSE_DESCRIPTION + ", " + COURSE_CU_COUNT + ") VALUES" +
-                "('C393 - IT Foundations', -99, 1, 'Not Attempted', '2017-06-30', '2017-06-30', 0, 0, " +
-                "'This course introduces students to information technology as a discipline and the various roles and functions of the IT department as business support.', " +
-                "3);");
         Log.d("Database", "Initial Course Inserted");
 
         //Create Initial Assessment
         db.execSQL("INSERT INTO " + TABLE_ASSESSMENT + " (" + ASSESSMENT_COURSE_ID + ", " + ASSESSMENT_TYPE + ", " +
-            ASSESSMENT_STATUS + ", " + ASSESSMENT_DUE_DATE + ") VALUES " +
-            "(1, 'Performance', 'Passed', '2017/06/30');");
+            ASSESSMENT_STATUS + ", " + ASSESSMENT_DUE_DATE + ", " + ASSESSMENT_DUE_DATE_REMINDER + ") VALUES " +
+            "(1, 'Performance', 'Passed', '2017/06/30', 0);");
         Log.d("Database", "Initial Assessment Inserted");
 
         //Create Initial Mentor

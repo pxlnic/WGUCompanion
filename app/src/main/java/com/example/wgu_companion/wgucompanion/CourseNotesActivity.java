@@ -2,6 +2,7 @@ package com.example.wgu_companion.wgucompanion;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AppCompatActivity;
@@ -29,7 +30,7 @@ public class CourseNotesActivity extends AppCompatActivity {
     //Activity Variables
     private String action;
     private String filter;
-    private Uri passedUri;
+    int courseId;
     ContentViewLoader contentLoader = new ContentViewLoader();
 
     @Override
@@ -40,8 +41,11 @@ public class CourseNotesActivity extends AppCompatActivity {
         Intent intent = getIntent();
 
         Uri uri = intent.getParcelableExtra(CompanionContentProvider.NOTE_ITEM_TYPE);
-        passedUri = intent.getParcelableExtra(CompanionContentProvider.ASSESSMENT_ITEM_TYPE);
-        Log.d("Load Data", "Passed URI: " + passedUri);
+
+        SharedPreferences pref = getSharedPreferences(AssessmentOverviewActivity.ASSESSMENT_PREFS, 0);
+        courseId = pref.getInt("courseId", 0);
+        Log.d("Load Data", "Course ID in Note: " + courseId);
+        Log.d("Load Data", "Passed URI: " + uri);
 
         if(uri == null){
             action = Intent.ACTION_INSERT;
@@ -110,19 +114,21 @@ public class CourseNotesActivity extends AppCompatActivity {
         getContentResolver().update(CompanionContentProvider.NOTE_URI, value, filter, null);
         Toast.makeText(this, "Note Updated", Toast.LENGTH_SHORT);
         setResult(RESULT_OK);
+        Log.d("Load Data", "Note Updated");
     }
 
     private void insertNote(String title, String text){
         ContentValues value = new ContentValues();
         value.put(DBHelper.NOTE_TITLE, title);
         value.put(DBHelper.NOTE_TEXT, text);
+        value.put(DBHelper.NOTE_COURSE_ID, courseId);
         getContentResolver().insert(CompanionContentProvider.NOTE_URI, value);
         Toast.makeText(this, "Note Inserted", Toast.LENGTH_SHORT);
         setResult(RESULT_OK);
+        Log.d("Load Data", "Note Inserted");
     }
 
     public void setViews(Uri uri) {
-
         //Set Note Title
         noteTitleText = contentLoader.loadNoteTitle(CourseNotesActivity.this, uri);
         noteTitleTv = (EditText) findViewById(R.id.course_note_title_text);
@@ -137,6 +143,7 @@ public class CourseNotesActivity extends AppCompatActivity {
     }
 
     private void finishedEditing(){
+        Log.d("Load Data", "Action: " + action);
         String newTitle = noteTitleTv.getText().toString().trim();
         String newText = noteTv.getText().toString().trim();
 
@@ -161,6 +168,7 @@ public class CourseNotesActivity extends AppCompatActivity {
                 }
                 break;
         }
+        finish();
     }
 
     @Override

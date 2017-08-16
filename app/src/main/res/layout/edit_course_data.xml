@@ -9,12 +9,17 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:fillViewport="true">
 
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/course_edit_scroll_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/course_edit_header"
@@ -28,41 +33,26 @@
                 android:id="@+id/course_edit_name_field"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_below="@id/course_edit_header"
                 android:layout_marginBottom="8dp"
-                android:ellipsize="end"
-                android:hint="Course # - Course Name"
-                android:maxLines="1" />
+                android:hint="Course # - Course Name"/>
 
             <Spinner
                 android:id="@+id/course_edit_status_spinner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_below="@+id/course_edit_name_field"
                 android:layout_marginBottom="8dp" />
 
             <RelativeLayout
                 android:id="@+id/course_edit_start_container"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/course_edit_status_spinner">
+                android:layout_height="wrap_content">
 
-                <EditText
-                    android:id="@+id/course_edit_start_field"
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_toLeftOf="@+id/course_edit_start_checkbox"
-                    android:layout_toStartOf="@+id/course_edit_start_checkbox"
-                    android:ellipsize="end"
-                    android:hint="Start Date (yyyy/mm/dd)"
-                    android:inputType="date"
-                    android:maxLines="1" />
+                    android:text="Start Date"
+                    android:id="@+id/course_edit_start_header"
+                    android:textSize="20sp"/>
 
                 <CheckBox
                     android:id="@+id/course_edit_start_checkbox"
@@ -74,25 +64,24 @@
 
             </RelativeLayout>
 
+            <DatePicker
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/course_edit_start_date_pick"
+                android:paddingBottom="8dp"/>
+
             <RelativeLayout
                 android:id="@+id/course_edit_end_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/course_edit_start_container"
                 android:layout_marginBottom="8dp">
 
-                <EditText
-                    android:id="@+id/course_edit_end_field"
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_toLeftOf="@+id/course_edit_end_checkbox"
-                    android:layout_toStartOf="@+id/course_edit_end_checkbox"
-                    android:ellipsize="end"
-                    android:hint="End Date (yyyy/mm/dd)"
-                    android:inputType="date"
-                    android:maxLines="1" />
+                    android:text="End Date"
+                    android:id="@+id/course_edit_end_header"
+                    android:textSize="20sp"/>
 
                 <CheckBox
                     android:id="@+id/course_edit_end_checkbox"
@@ -104,13 +93,16 @@
 
             </RelativeLayout>
 
+            <DatePicker
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
+                android:id="@+id/course_edit_end_date_pick"/>
+
             <TextView
                 android:id="@+id/course_edit_assessment_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_below="@+id/course_edit_end_container"
                 android:layout_marginBottom="8dp"
                 android:text="Assessments"
                 android:textSize="20sp" />
@@ -119,11 +111,8 @@
                 android:id="@+id/course_edit_assessment_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_below="@+id/course_edit_assessment_header"
                 android:layout_marginBottom="8dp"
-                android:isScrollContainer="false"
+                android:nestedScrollingEnabled="true"
                 tools:listitem="@layout/list_item_checkbox">
 
             </ListView>
@@ -132,9 +121,6 @@
                 android:id="@+id/course_edit_description_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_below="@id/course_edit_assessment_list"
                 android:layout_marginBottom="8dp"
                 android:text="Description"
                 android:textSize="20sp" />
@@ -143,9 +129,6 @@
                 android:id="@+id/course_edit_description_field"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_below="@+id/course_edit_description_header"
                 android:layout_marginBottom="8dp"
                 android:hint="Enter course description here..." />
 
@@ -153,26 +136,50 @@
                 android:id="@+id/course_edit_mentor_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_below="@+id/course_edit_description_field"
                 android:layout_marginBottom="8dp"
                 android:text="Mentors"
                 android:textSize="20sp" />
 
             <ListView
                 android:id="@+id/course_edit_mentor_list"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_below="@+id/course_edit_mentor_header"
                 android:layout_marginBottom="8dp"
-                android:isScrollContainer="false"
+                android:nestedScrollingEnabled="true"
                 tools:listitem="@layout/list_item_checkbox">
 
             </ListView>
 
-        </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/course_edit_submit_button"
+                    android:text="Submit"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/course_edit_delete_button"
+                    android:layout_toLeftOf="@+id/course_edit_submit_button"
+                    android:layout_toStartOf="@+id/course_edit_submit_button"
+                    android:text="Delete"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/course_edit_cancel_button"
+                    android:layout_toLeftOf="@+id/course_edit_delete_button"
+                    android:layout_toStartOf="@+id/course_edit_delete_button"
+                    android:text="Cancel"/>
+
+            </RelativeLayout>
+
+        </LinearLayout>
     </ScrollView>
 </RelativeLayout>

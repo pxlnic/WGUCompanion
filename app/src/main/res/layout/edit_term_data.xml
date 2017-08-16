@@ -6,136 +6,153 @@
     android:orientation="vertical"
     android:padding="12dp">
 
-    <TextView
-        android:id="@+id/term_edit_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:text="New Term"
-        android:textSize="22sp" />
-
-    <EditText
-        android:id="@+id/term_edit_name_field"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/term_edit_header"
-        android:layout_marginBottom="8dp"
-        android:hint="Term Name"
-        android:textSize="16sp" />
-
-    <Spinner
-        android:id="@+id/term_edit_status_spinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/term_edit_name_field"
-        android:layout_marginBottom="8dp" />
-
-    <RelativeLayout
-        android:id="@+id/term_edit_start_container"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/term_edit_status_spinner"
-        android:layout_marginBottom="8dp">
-
-        <EditText
-            android:id="@+id/term_edit_start_field"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_toLeftOf="@+id/term_edit_start_checkbox"
-            android:hint="Start Date (yyyy/mm/dd)"
-            android:textSize="14sp" />
-
-        <CheckBox
-            android:id="@+id/term_edit_start_checkbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:text="Reminder" />
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/term_edit_end_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/term_edit_start_container"
-        android:layout_marginBottom="8dp">
-
-        <EditText
-            android:id="@+id/term_edit_end_field"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_toLeftOf="@+id/term_edit_end_checkbox"
-            android:hint="End Date (yyyy/mm/dd)"
-            android:textSize="14sp" />
-
-        <CheckBox
-            android:id="@+id/term_edit_end_checkbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:text="Reminder" />
-
-    </RelativeLayout>
-
-    <TextView
-        android:id="@+id/term_edit_course_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/term_edit_end_container"
-        android:layout_marginBottom="8dp"
-        android:text="Courses"
-        android:textSize="20sp" />
-
-    <ListView
-        android:id="@+id/term_edit_course_list"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/term_edit_course_header"
-        android:layout_marginBottom="8dp"
-        android:isScrollContainer="false"
-        android:layout_above="@+id/term_edit_submit_button"
-        tools:listitem="@layout/list_item_checkbox"/>
+        android:layout_alignParentTop="true"
+        android:fillViewport="true">
 
-    <Button
-        android:id="@+id/term_edit_submit_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:text="Submit" />
+        <LinearLayout
+            android:id="@+id/course_edit_scroll_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <Button
-        android:id="@+id/term_edit_delete_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_toLeftOf="@+id/term_edit_submit_button"
-        android:layout_toStartOf="@+id/term_edit_submit_button"
-        android:text="Delete" />
+            <TextView
+                android:id="@+id/term_edit_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="New Term"
+                android:textSize="22sp" />
 
-    <Button
-        android:id="@+id/term_edit_cancel_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_toLeftOf="@+id/term_edit_delete_button"
-        android:layout_toStartOf="@+id/term_edit_delete_button"
-        android:text="Cancel" />
+            <EditText
+                android:id="@+id/term_edit_name_field"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:hint="Term Name"
+                android:textSize="16sp" />
 
+            <Spinner
+                android:id="@+id/term_edit_status_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp" />
+
+            <RelativeLayout
+                android:id="@+id/term_edit_start_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:id="@+id/term_edit_start_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:text="Start Date"
+                    android:textSize="20sp" />
+
+                <CheckBox
+                    android:id="@+id/term_edit_start_checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:text="Reminder" />
+
+            </RelativeLayout>
+
+            <DatePicker
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/term_edit_start_picker"
+                android:paddingBottom="8dp"/>
+
+            <RelativeLayout
+                android:id="@+id/term_edit_end_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:id="@+id/term_edit_end_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:text="End Date"
+                    android:textSize="20sp" />
+
+                <CheckBox
+                    android:id="@+id/term_edit_end_checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:text="Reminder" />
+
+            </RelativeLayout>
+
+            <DatePicker
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/term_edit_end_picker"
+                android:paddingBottom="8dp"/>
+
+            <TextView
+                android:id="@+id/term_edit_course_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Courses"
+                android:textSize="20sp" />
+
+            <ListView
+                android:id="@+id/term_edit_course_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                android:layout_marginBottom="8dp"
+                android:isScrollContainer="false"
+                android:layout_above="@+id/term_edit_submit_button"
+                tools:listitem="@layout/list_item_checkbox"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <Button
+                    android:id="@+id/term_edit_submit_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:text="Submit" />
+
+                <Button
+                    android:id="@+id/term_edit_delete_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_toLeftOf="@+id/term_edit_submit_button"
+                    android:layout_toStartOf="@+id/term_edit_submit_button"
+                    android:text="Delete" />
+
+                <Button
+                    android:id="@+id/term_edit_cancel_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_toLeftOf="@+id/term_edit_delete_button"
+                    android:layout_toStartOf="@+id/term_edit_delete_button"
+                    android:text="Cancel" />
+            </RelativeLayout>
+
+        </LinearLayout>
+    </ScrollView>
 </RelativeLayout>
