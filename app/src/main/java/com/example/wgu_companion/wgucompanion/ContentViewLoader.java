@@ -1,6 +1,10 @@
 package com.example.wgu_companion.wgucompanion;
 
+import android.app.AlarmManager;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
@@ -8,6 +12,7 @@ import android.util.Log;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -16,6 +21,7 @@ public class ContentViewLoader {
 
     }
 
+    //Program loaders
     public String loadProgramName(Context c) {
         String program;
         Uri uri = CompanionContentProvider.PROGRAM_URI;
@@ -71,6 +77,7 @@ public class ContentViewLoader {
         return total;
     }
 
+    //Term Loaders
     public String loadTermName(Context c, Uri id) {
         String term;
         Uri uri = CompanionContentProvider.TERM_URI;
@@ -184,6 +191,9 @@ public class ContentViewLoader {
         return isChecked;
     }
 
+    //Course Loaders
+    private static String courseAction;
+
     public List<String> loadCourseIds(Cursor cursor) {
         List<String> termCourseIds = new ArrayList<>();
         cursor.moveToFirst();
@@ -286,9 +296,6 @@ public class ContentViewLoader {
         cursor.moveToFirst();
         courseStatus = cursor.getString(cursor.getColumnIndex(DBHelper.COURSE_STATUS));
 
-        //courseStatus = loadStatus(c, courseStatusId);
-
-
         return courseStatus;
     }
 
@@ -302,6 +309,14 @@ public class ContentViewLoader {
 
 
         return courseDescription;
+    }
+
+    public static void setCourseAction(String a){
+        courseAction = a;
+    }
+
+    public static String getCourseAction(){
+        return courseAction;
     }
 
 //Save New/Edited Course Data
@@ -372,32 +387,7 @@ public class ContentViewLoader {
         cursor.moveToFirst();
         assessmentStatus = cursor.getString(cursor.getColumnIndex(DBHelper.ASSESSMENT_STATUS));
 
-
-        //assessmentStatus = loadStatus(c, statusId);
-
         return assessmentStatus;
-    }
-
-    public List<String> loadAssessmentIds(Cursor cursor) {
-        List<String> courseAssessmentIds = new ArrayList<>();
-        cursor.moveToFirst();
-        for (int i = 0; i < cursor.getCount(); i++) {
-            courseAssessmentIds.add(cursor.getString(cursor.getColumnIndex(DBHelper.ASSESSMENT_ID)));
-            cursor.moveToNext();
-        }
-
-        return courseAssessmentIds;
-    }
-
-    public List<String> loadAssessmentCourseIds(Cursor cursor) {
-        List<String> courseAssessmentIds = new ArrayList<>();
-        cursor.moveToFirst();
-        for (int i = 0; i < cursor.getCount(); i++) {
-            courseAssessmentIds.add(cursor.getString(cursor.getColumnIndex(DBHelper.ASSESSMENT_COURSE_ID)));
-            cursor.moveToNext();
-        }
-
-        return courseAssessmentIds;
     }
 
     public List<String> loadMentorIds(Cursor cursor) {
@@ -441,6 +431,17 @@ public class ContentViewLoader {
         return noteText;
     }
 
+    public Uri loadNoteImage(Context c, Uri id){
+        Uri imageUri;
+        String filter = DBHelper.NOTE_ID + "=" + id.getLastPathSegment();
+        Cursor cursor = c.getContentResolver().query(CompanionContentProvider.NOTE_URI, DBHelper.NOTE_COLUMNS, filter, null, null);
+        cursor.moveToFirst();
+        imageUri = Uri.parse(cursor.getString(cursor.getColumnIndex(DBHelper.NOTE_PHOTO_PATH)));
+        Log.d("Load Data", "Image URI Loading: " + imageUri.toString());
+
+        return imageUri;
+    }
+
     //Other Getter Methods
     //Date Conversions
     public String convertDate(int day, int month, int year) {
@@ -482,69 +483,20 @@ public class ContentViewLoader {
         return typeName;
     }
 
-    //Create list of reminders
-    public void setReminders(Context context) throws ParseException {
-        List<CompanionReminders> reminderList = new ArrayList<>();
-        Date now = new Date();
-        Log.d("Load Data", "Current Date: " + now);
+    //Alarm Manager
+    public void setReminder(Context alarmContext, int alarmYear, int alarmMonth, int alarmDay, String title, String msg, String ticker){
+        Intent alarmIntent = new Intent(alarmContext, AlarmReceiver.class);
+        alarmIntent.putExtra("message", msg);
+        alarmIntent.putExtra("title", title);
+        alarmIntent.putExtra("ticker", ticker);
 
-        //Get Term Reminders
-        String termFilter = DBHelper.TERM_START_REMINDER + "= 1 OR" + DBHelper.TERM_END_REMINDER + "= 1";
-        Cursor termCursor = context.getContentResolver().query(CompanionContentProvider.TERM_URI, DBHelper.TERM_COLUMNS,
-                termFilter, null, null);
-        termCursor.moveToFirst();
+        PendingIntent pIntent = PendingIntent.getBroadcast(alarmContext, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager aManager = (AlarmManager) alarmContext.getSystemService(Context.ALARM_SERVICE);
 
-        //Check if any reminders currently
-        if (termCursor.getCount() > 0) {
-            for (int i = 0; i < termCursor.getCount(); i++) {
-                int startRemind = termCursor.getInt(termCursor.getColumnIndex(DBHelper.TERM_START_REMINDER));
-                int endRemind = termCursor.getInt(termCursor.getColumnIndex(DBHelper.TERM_END_REMINDER));
-
-                //Create Term Reminder Entity
-                CompanionReminders c = new CompanionReminders();
-
-                //Set Reminders
-                int termId = termCursor.getInt(termCursor.getColumnIndex(DBHelper.TERM_ID));
-                c.setTermReminderId(termId);
-                Date startDate;
-                Date endDate;
-                boolean isStart = false;
-                boolean isEnd = false;
-
-                //Check if Start needs reminder
-                String startDateText = termCursor.getString(termCursor.getColumnIndex(DBHelper.TERM_START_DATE));
-                Date verifyStart = new SimpleDateFormat("yyyy/MM/dd").parse(startDateText);
-                if (startRemind == 1 && verifyStart.after(now)) {
-                    startDate = new SimpleDateFormat("yyyy/MM/dd").parse(startDateText);
-                    c.setTermReminderStart(startDate);
-                    isStart = true;
-                }
-
-                //Check if End needs reminder
-                String endDateText = termCursor.getString(termCursor.getColumnIndex(DBHelper.TERM_END_DATE));
-                Date verifyEnd = new SimpleDateFormat("yyyy/MM/dd").parse(endDateText);
-                if (endRemind == 1 && verifyEnd.after(now)) {
-                    endDate = new SimpleDateFormat("yyyy/MM/dd").parse(endDateText);
-                    c.setTermReminderEnd(endDate);
-                    isEnd = true;
-                }
-
-                //Set Reminder Info
-                if (isStart || isEnd) {
-                    reminderList.add(c);
-                }
-
-                termCursor.moveToNext();
-            }
-        }
-
-        //Set Course Reminders
-
-
-        //Set Assessment Reminders
-
-
-        //Add Notifications for each reminder
-
+        Calendar cal = Calendar.getInstance();
+        cal.set(alarmYear, alarmMonth-1, alarmDay-1, 1,9);
+        Log.d("Load Data", "Reminder Time: " + cal.getTime());
+        Long time = cal.getTimeInMillis();
+        aManager.set(AlarmManager.RTC_WAKEUP, time, pIntent);
     }
 }

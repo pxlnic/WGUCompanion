@@ -153,7 +153,9 @@ public class TermDetailActivity extends AppCompatActivity{
 
         for(int i=0; i<statusCursor.getCount(); i++){
             String name = statusCursor.getString(statusCursor.getColumnIndex(DBHelper.STATUS_NAME));
-            statusArray.add(name);
+            if(name.equals("Complete")|| name.equals("In Progress") || name.equals("Not Attempted")) {
+                statusArray.add(name);
+            }
             statusCursor.moveToNext();
         }
 
@@ -244,6 +246,7 @@ public class TermDetailActivity extends AppCompatActivity{
                     int submitTermStartReminder = 0;
                     if (termStartChk.isChecked()) {
                         submitTermStartReminder = 1;
+                        contentLoader.setReminder(TermDetailActivity.this, pickStartYear, pickStartMonth, pickStartDay, "New Term Tomorrow", termNameText, "Upcoming Term");
                     }
 
                     int pickEndDay = termEndPick.getDayOfMonth();
@@ -255,6 +258,7 @@ public class TermDetailActivity extends AppCompatActivity{
                     int submitTermEndReminder = 0;
                     if (termEndChk.isChecked()) {
                         submitTermEndReminder = 1;
+                        contentLoader.setReminder(TermDetailActivity.this, pickEndYear, pickEndMonth, pickEndDay, "Term Ends Tomorrow", termNameText, "Term Ending");
                     }
 
                     //Get Course ID's and Course/Term IDs

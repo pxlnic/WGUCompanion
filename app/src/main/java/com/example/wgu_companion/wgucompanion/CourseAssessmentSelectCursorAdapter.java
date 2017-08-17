@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Paint;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,6 +51,7 @@ public class CourseAssessmentSelectCursorAdapter extends CursorAdapter {
             String aTypeName = assessmentCursor.getString(assessmentCursor.getColumnIndex(DBHelper.ASSESSMENT_TYPE));
             if(courseId == aCourseId && assessmentTypeText.equals(aTypeName)){
                 check = true;
+                Log.d("Load Date", "Assessment Course ID: " + aCourseId + ", Course ID: " + courseId);
             }
             assessmentCursor.moveToNext();
         }
@@ -62,7 +64,12 @@ public class CourseAssessmentSelectCursorAdapter extends CursorAdapter {
         String name = cursor.getString(cursor.getColumnIndex(DBHelper.ASSESSMENT_TYPE_NAME));
 
         //Set Values
-        assessmentChkBx.setChecked(check);
+        if(ContentViewLoader.getCourseAction().equals("insert")){
+            assessmentChkBx.setChecked(false);
+        }
+        else {
+            assessmentChkBx.setChecked(check);
+        }
         assessmentType.setText(name);
     }
 }

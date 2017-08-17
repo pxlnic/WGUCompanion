@@ -7,11 +7,12 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal">
 
             <TextView
                 android:id="@+id/assessment_edit_header"
@@ -100,7 +101,7 @@
                 android:id="@+id/assessment_edit_button_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true">
+                android:layout_below="@+id/assessment_edit_date_picker">
 
                 <Button
                     android:id="@+id/assessment_edit_submit_button"

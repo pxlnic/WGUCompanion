@@ -152,6 +152,8 @@ public class CoursesOverviewActivity extends AppCompatActivity{
         final Dialog addCourseDialog = new Dialog(CoursesOverviewActivity.this);
         addCourseDialog.setContentView(R.layout.edit_course_data);
 
+        ContentViewLoader.setCourseAction("insert");
+
         TextView addCourseHeader = (TextView)  addCourseDialog.findViewById(R.id.course_edit_header);
         addCourseHeader.setText("New Course");
 
@@ -253,6 +255,7 @@ public class CoursesOverviewActivity extends AppCompatActivity{
                     int submitCourseStartReminder = 0;
                     if (editCourseStartChk.isChecked()) {
                         submitCourseStartReminder = 1;
+                        contentLoader.setReminder(CoursesOverviewActivity.this, pickStartYear, pickStartMonth, pickStartDay, "New Course Tomorrow", submitCourseName, "Upcoming Course");
                     }
 
 
@@ -265,6 +268,7 @@ public class CoursesOverviewActivity extends AppCompatActivity{
                     int submitCourseEndReminder = 0;
                     if (editCourseEndChk.isChecked()) {
                         submitCourseEndReminder = 1;
+                        contentLoader.setReminder(CoursesOverviewActivity.this, pickEndYear, pickEndMonth, pickEndDay, "Course Ends Tomorrow", submitCourseName, "Course Ending");
                     }
                     String submitCourseDescription = editCourseDescriptionEv.getText().toString().trim();
 

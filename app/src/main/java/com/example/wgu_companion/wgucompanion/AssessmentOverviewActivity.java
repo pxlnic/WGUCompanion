@@ -13,6 +13,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -214,6 +216,7 @@ public class AssessmentOverviewActivity extends AppCompatActivity{
                 int updateAssessmentReminder = 0;
                 if(assessmentGoalReminderChk.isChecked()){
                     updateAssessmentReminder = 1;
+                    loader.setReminder(AssessmentOverviewActivity.this, pickYear, pickMonth, pickDay, "Assessment Tomorrow", updateAssessmentName, "Upcoming Assessment");
                 }
 
                 try {
@@ -265,6 +268,8 @@ public class AssessmentOverviewActivity extends AppCompatActivity{
         });
 
         addAssessmentDialog.show();
+        Window window = addAssessmentDialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
     }
 
     private void insertAssessment(int id, String type, String status, String date, int reminder) {

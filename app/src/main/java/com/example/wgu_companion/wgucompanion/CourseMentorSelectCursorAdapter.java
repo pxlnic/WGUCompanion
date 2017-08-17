@@ -58,7 +58,12 @@ public class CourseMentorSelectCursorAdapter extends CursorAdapter {
         String mentorText = cursor.getString(cursor.getColumnIndex(DBHelper.MENTOR_NAME));
 
         //Bind values
-        mentorChk.setChecked(check);
+        if(ContentViewLoader.getCourseAction().equals("insert")){
+            mentorChk.setChecked(false);
+        }
+        else {
+            mentorChk.setChecked(check);
+        }
         mentorTv.setText(mentorText);
     }
 }

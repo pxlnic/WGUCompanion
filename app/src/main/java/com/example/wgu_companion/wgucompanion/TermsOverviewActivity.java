@@ -129,7 +129,7 @@ public class TermsOverviewActivity extends AppCompatActivity{
         final Spinner termStatusSpin = (Spinner) addTermDialog.findViewById(R.id.term_edit_status_spinner);
         ArrayAdapter<String> termStatusAdapter = new ArrayAdapter<>(addTermDialog.getContext(),
                 android.R.layout.simple_spinner_item,
-                getResources().getStringArray(R.array.term_status_array));
+                statusArray);
         termStatusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         termStatusSpin.setAdapter(termStatusAdapter);
 
@@ -183,6 +183,7 @@ public class TermsOverviewActivity extends AppCompatActivity{
                     int submitTermStartReminder = 0;
                     if (termStartChk.isChecked()) {
                         submitTermStartReminder = 1;
+                        contentLoader.setReminder(TermsOverviewActivity.this, pickStartYear, pickStartMonth, pickStartDay, "New Term Tomorrow", submitTermName, "Upcoming Term");
                     }
 
                     int pickEndDay = termEndPick.getDayOfMonth();
@@ -194,6 +195,7 @@ public class TermsOverviewActivity extends AppCompatActivity{
                     int submitTermEndReminder = 0;
                     if (termEndChk.isChecked()) {
                         submitTermEndReminder = 1;
+                        contentLoader.setReminder(TermsOverviewActivity.this, pickEndYear, pickEndMonth, pickEndDay, "Term Ends Tomorrow", submitTermName, "Term Ending");
                     }
 
                     //Get Course ID's

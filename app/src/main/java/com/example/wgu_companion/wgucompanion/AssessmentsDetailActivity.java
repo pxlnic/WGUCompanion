@@ -81,6 +81,7 @@ public class AssessmentsDetailActivity extends AppCompatActivity{
     @Override
     protected void onResume(){
         super.onResume();
+        setViews(uriToPass);
     }
 
     @Override
@@ -258,6 +259,7 @@ public class AssessmentsDetailActivity extends AppCompatActivity{
                 int updateAssessmentReminder = 0;
                 if(assessmentGoalReminderChk.isChecked()){
                     updateAssessmentReminder = 1;
+                    loader.setReminder(AssessmentsDetailActivity.this, pickYear, pickMonth, pickDay, "Assessment Tomorrow", assessmentCourseNameText, "Upcoming Assessment");
                 }
 
                 try {

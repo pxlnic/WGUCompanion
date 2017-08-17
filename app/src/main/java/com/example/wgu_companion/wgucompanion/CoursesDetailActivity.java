@@ -201,6 +201,8 @@ public class CoursesDetailActivity extends AppCompatActivity{
     }
 
     private void editCourse() throws ParseException {
+        ContentViewLoader.setCourseAction("update");
+
         String dialogCourseStatusText = courseStatusText;
 
         final Dialog editCourseDialog = new Dialog(CoursesDetailActivity.this);
@@ -347,6 +349,8 @@ public class CoursesDetailActivity extends AppCompatActivity{
                     int submitCourseStartReminder = 0;
                     if (editCourseStartChk.isChecked()) {
                         submitCourseStartReminder = 1;
+                        contentLoader.setReminder(CoursesDetailActivity.this, pickStartYear, pickStartMonth, pickStartDay, "New Course Tomorrow", courseNameText, "Upcoming Course");
+
                     }
 
                     int pickEndDay = editCourseEndPick.getDayOfMonth();
@@ -358,6 +362,8 @@ public class CoursesDetailActivity extends AppCompatActivity{
                     int submitCourseEndReminder = 0;
                     if (editCourseEndChk.isChecked()) {
                         submitCourseEndReminder = 1;
+                        contentLoader.setReminder(CoursesDetailActivity.this, pickEndYear, pickEndMonth, pickEndDay, "Course Ends Tomorrow", courseNameText, "Course Ending");
+
                     }
                     String submitCourseDescription = editCourseDescriptionEv.getText().toString().trim();
 
@@ -666,11 +672,18 @@ public class CoursesDetailActivity extends AppCompatActivity{
                 final Dialog editMentorDialog = new Dialog(CoursesDetailActivity.this);
                 editMentorDialog.setContentView(R.layout.edit_mentor);
 
-                final String editMentorFilter = DBHelper.MENTOR_ID + "=" + id;
-                Log.d("Load Data", "Mentor Filter: " + editMentorFilter);
+                final String testFilter = DBHelper.MENTOR_COURSE_ID + "=" + id;
+                Log.d("Load Data", "Mentor Filter: " + testFilter);
+                Cursor testCursor = getContentResolver().query(CompanionContentProvider.COURSE_MENTOR_URI,
+                        DBHelper.COURSE_MENTOR_COLUMNS, testFilter, null, null);
+                testCursor.moveToFirst();
+
+                final int mentorId = testCursor.getInt(testCursor.getColumnIndex(DBHelper.MENTOR_COURSE_M_ID));
+                final String editMentorFilter = DBHelper.MENTOR_ID + "=" + mentorId;
                 Cursor editMentorCursor = getContentResolver().query(CompanionContentProvider.MENTOR_URI, DBHelper.MENTOR_COLUMNS,
                         editMentorFilter, null, null);
                 editMentorCursor.moveToFirst();
+
                 Log.d("Load Data", "Mentor Count: " + editMentorCursor.getCount());
 
                 TextView addMentorHeader = (TextView) editMentorDialog.findViewById(R.id.edit_mentor_header);
@@ -719,6 +732,8 @@ public class CoursesDetailActivity extends AppCompatActivity{
                     @Override
                     public void onClick(View arg0) {
                         getContentResolver().delete(CompanionContentProvider.MENTOR_URI, editMentorFilter, null);
+                        String cmFilter = DBHelper.MENTOR_COURSE_M_ID + "=" + mentorId;
+                        getContentResolver().delete(CompanionContentProvider.COURSE_MENTOR_URI, cmFilter, null);
 
                         editMentorDialog.cancel();
 
